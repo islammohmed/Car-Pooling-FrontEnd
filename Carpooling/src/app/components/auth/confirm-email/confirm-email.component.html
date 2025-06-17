@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="login-card">
+    <!-- Header -->
+    <div class="login-header">
+      <div class="logo">
+        <i class="fas fa-car"></i>
+        <span>RideConnect Egypt</span>
+      </div>
+      <h2>Confirm Your Email</h2>
+      <p>Please enter the 6-digit code sent to your email</p>
+    </div>
+
+    <!-- Confirm Code Form -->
+    <form [formGroup]="confirmForm" (ngSubmit)="onConfirm()" class="login-form">
+      <!-- Code Input -->
+      <div class="form-group">
+        <label for="code">Verification Code</label>
+        <div class="input-wrapper">
+          <i class="fas fa-key"></i>
+          <input
+            type="text"
+            id="code"
+            formControlName="code"
+            maxlength="6"
+            placeholder="Enter 6-digit code"
+            [class.error]="code?.invalid && code?.touched"
+            (input)="onCodeInput($event)"
+            autocomplete="one-time-code">
+        </div>
+        <div class="error-message" *ngIf="code?.invalid && code?.touched">
+          <span *ngIf="code?.errors?.['required']">Code is required</span>
+          <span *ngIf="code?.errors?.['pattern']">Code must be 6 digits</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="login-btn"
+        [disabled]="isSubmitting"
+        [class.loading]="isSubmitting">
+        <span *ngIf="!isSubmitting">Verify</span>
+        <span *ngIf="isSubmitting">
+          <i class="fas fa-spinner fa-spin"></i>
+          Verifying...
+        </span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>Didn't receive the code?
+        <a href="#" (click)="resendCode(); $event.preventDefault()" 
+           class="signup-link" 
+           [class.disabled]="isResending">
+          <span *ngIf="!isResending">Resend</span>
+          <span *ngIf="isResending">
+            <i class="fas fa-spinner fa-spin"></i>
+            Sending...
+          </span>
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

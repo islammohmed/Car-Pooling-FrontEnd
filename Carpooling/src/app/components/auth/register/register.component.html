@@ -1,0 +1,235 @@
+<!-- register.component.html -->
+<div class="register-container">
+  <div class="register-card">
+    <!-- Header -->
+    <div class="register-header">
+      <div class="logo">
+        <i class="fas fa-car"></i>
+        <span>RideConnect Egypt</span>
+      </div>
+      <h2>Join Our Community</h2>
+      <p>Create your account to start sharing rides</p>
+    </div>
+
+    <!-- Registration Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form" novalidate>
+      
+      <!-- Name Fields Row -->
+      <div class="form-row">
+        <!-- First Name -->
+        <div class="form-group half-width">
+          <label for="firstName">First Name *</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input 
+              type="text" 
+              id="firstName" 
+              formControlName="firstName"
+              placeholder="Enter first name"
+              maxlength="50"
+              autocomplete="given-name"
+              [class.error]="firstName?.invalid && firstName?.touched">
+          </div>
+          <div class="error-message" *ngIf="firstName?.invalid && firstName?.touched">
+            <span *ngIf="firstName?.errors?.['required']">First name is required</span>
+            <span *ngIf="firstName?.errors?.['minlength']">At least 2 characters required</span>
+            <span *ngIf="firstName?.errors?.['maxlength']">Maximum 50 characters allowed</span>
+            <span *ngIf="firstName?.errors?.['pattern']">Only letters and spaces allowed</span>
+          </div>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-group half-width">
+          <label for="lastName">Last Name *</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input 
+              type="text" 
+              id="lastName" 
+              formControlName="lastName"
+              placeholder="Enter last name"
+              maxlength="50"
+              autocomplete="family-name"
+              [class.error]="lastName?.invalid && lastName?.touched">
+          </div>
+          <div class="error-message" *ngIf="lastName?.invalid && lastName?.touched">
+            <span *ngIf="lastName?.errors?.['required']">Last name is required</span>
+            <span *ngIf="lastName?.errors?.['minlength']">At least 2 characters required</span>
+            <span *ngIf="lastName?.errors?.['maxlength']">Maximum 50 characters allowed</span>
+            <span *ngIf="lastName?.errors?.['pattern']">Only letters and spaces allowed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            placeholder="Enter your email"
+            maxlength="100"
+            autocomplete="email"
+            [class.error]="email?.invalid && email?.touched">
+        </div>
+        <div class="error-message" *ngIf="email?.invalid && email?.touched">
+          <span *ngIf="email?.errors?.['required']">Email is required</span>
+          <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+          <span *ngIf="email?.errors?.['maxlength']">Email is too long</span>
+        </div>
+      </div>
+
+      <!-- Phone Field -->
+      <div class="form-group">
+        <label for="phone">Phone Number *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-phone"></i>
+          <input 
+            type="tel" 
+            id="phone" 
+            formControlName="phone"
+            placeholder="01xxxxxxxxx or +201xxxxxxxxx"
+            maxlength="15"
+            autocomplete="tel"
+            [class.error]="phone?.invalid && phone?.touched">
+        </div>
+        <div class="error-message" *ngIf="phone?.invalid && phone?.touched">
+          <span *ngIf="phone?.errors?.['required']">Phone number is required</span>
+          <span *ngIf="phone?.errors?.['pattern']">Please enter a valid Egyptian phone number (01xxxxxxxxx or +201xxxxxxxxx)</span>
+        </div>
+      </div>
+
+      <!-- National ID Field -->
+      <div class="form-group">
+        <label for="nationalId">National ID Number *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-id-card"></i>
+          <input 
+            type="text" 
+            id="nationalId" 
+            formControlName="nationalId"
+            placeholder="14-digit National ID"
+            maxlength="14"
+            pattern="[0-9]*"
+            inputmode="numeric"
+            [class.error]="nationalId?.invalid && nationalId?.touched">
+        </div>
+        <div class="error-message" *ngIf="nationalId?.invalid && nationalId?.touched">
+          <span *ngIf="nationalId?.errors?.['required']">National ID is required</span>
+          <span *ngIf="nationalId?.errors?.['pattern']">Must be exactly 14 digits</span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password"
+            placeholder="Create a strong password"
+            maxlength="100"
+            autocomplete="new-password"
+            [class.error]="password?.invalid && password?.touched">
+          <button 
+            type="button" 
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+            tabindex="-1">
+            <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </button>
+        </div>
+        
+        <!-- Password Strength Indicator -->
+        <div class="password-strength" *ngIf="password?.value">
+          <div class="strength-bar">
+            <div class="strength-fill" [class]="getPasswordStrength()"></div>
+          </div>
+          <span class="strength-text" [class]="getPasswordStrength()">
+            {{ getPasswordStrength() | titlecase }} Password
+          </span>
+        </div>
+        
+        <div class="error-message" *ngIf="password?.invalid && password?.touched">
+          <span *ngIf="password?.errors?.['required']">Password is required</span>
+          <span *ngIf="password?.errors?.['minlength']">Password must be at least 8 characters</span>
+          <span *ngIf="password?.errors?.['maxlength']">Password is too long</span>
+          <span *ngIf="password?.errors?.['passwordStrength']">
+            Password must contain uppercase, lowercase, number, and special character
+          </span>
+        </div>
+        
+    
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            id="confirmPassword" 
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            maxlength="100"
+            autocomplete="new-password"
+            [class.error]="confirmPassword?.invalid && confirmPassword?.touched">
+          <button 
+            type="button" 
+            class="toggle-password"
+            (click)="toggleConfirmPasswordVisibility()"
+            tabindex="-1">
+            <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="confirmPassword?.invalid && confirmPassword?.touched">
+          <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
+          <span *ngIf="confirmPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="form-group">
+        <label class="checkbox-wrapper">
+          <input 
+            type="checkbox" 
+            id="termsAccepted"
+            formControlName="termsAccepted"
+            [class.error]="termsAccepted?.invalid && termsAccepted?.touched">
+          <span class="checkmark"></span>
+          I agree to the <a href="#" class="link" target="_blank">Terms of Service</a> and <a href="#" class="link" target="_blank">Privacy Policy</a> *
+        </label>
+        <div class="error-message" *ngIf="termsAccepted?.invalid && termsAccepted?.touched">
+          <span *ngIf="termsAccepted?.errors?.['required']">You must accept the terms and conditions</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="register-btn"
+        [disabled]="isLoading || registerForm.invalid"
+        [class.loading]="isLoading">
+        <span *ngIf="!isLoading">
+          <i class="fas fa-user-plus"></i>
+          Create Account
+        </span>
+        <span *ngIf="isLoading">
+          <i class="fas fa-spinner fa-spin"></i>
+          Creating Account...
+        </span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="register-footer">
+      <p>Already have an account? <a href="/login" class="login-link">Sign In</a></p>
+    </div>
+  </div>
+</div>
