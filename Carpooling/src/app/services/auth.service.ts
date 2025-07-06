@@ -42,11 +42,35 @@ export interface LoginResponse {
   errors: string[];
 }
 
+export interface VerificationResponse {
+  success: boolean;
+  message: string;
+  data?: boolean;
+  errors?: string[];
+}
+
+export interface DocumentVerificationDto {
+  id: number;
+  userId: string;
+  userFullName: string;
+  documentType: string;
+  documentImage: string;
+  status: 'Pending' | 'UnderReview' | 'Approved' | 'Rejected';
+  submissionDate: string;
+}
+
+export interface DocumentVerificationsResponse {
+  success: boolean;
+  message: string;
+  data?: DocumentVerificationDto[];
+  errors?: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'https://localhost:7262/api/Auth';
+  private baseUrl = 'https://localhost:7262/api';
 
   constructor(private http: HttpClient) {}
 
@@ -55,7 +79,7 @@ export class AuthService {
       'Content-Type': 'application/json'
     });
 
-    return this.http.post<RegisterResponse>(`${this.baseUrl}/register`, userData, {
+    return this.http.post<RegisterResponse>(`${this.baseUrl}/Auth/register`, userData, {
       headers
     });
   }
@@ -65,7 +89,30 @@ export class AuthService {
       'Content-Type': 'application/json'
     });
 
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, loginData, {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/Auth/login`, loginData, {
+      headers
+    });
+  }
+
+  verifyPassengerNationalId(nationalIdImage: File): Observable<VerificationResponse> {
+    const formData = new FormData();
+    formData.append('NationalIdImage', nationalIdImage);
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+
+    return this.http.post<VerificationResponse>(`${this.baseUrl}/User/passenger/verify`, formData, {
+      headers
+    });
+  }
+
+  getDocumentVerifications(): Observable<DocumentVerificationsResponse> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+
+    return this.http.get<DocumentVerificationsResponse>(`${this.baseUrl}/User/documents/status`, {
       headers
     });
   }
