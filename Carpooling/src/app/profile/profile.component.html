@@ -1,0 +1,102 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>User Profile</h1>
+  </div>
+
+  <div class="profile-content" *ngIf="userData">
+    <!-- User Information Section -->
+    <div class="profile-section">
+      <h2>Personal Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Full Name:</label>
+          <span>{{ userData.firstName }} {{ userData.lastName }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ userData.email }}</span>
+        </div>
+        <div class="info-item">
+          <label>Role:</label>
+          <span class="role-badge">{{ getUserRoleText(userData.userRole) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email Confirmation:</label>
+          <span class="status-badge" [class.verified]="userData.isEmailConfirmed" [class.not-verified]="!userData.isEmailConfirmed">
+            {{ getEmailConfirmationStatusText(userData.isEmailConfirmed) }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- National ID Verification Section -->
+    <div class="profile-section">
+      <h2>National ID Verification</h2>
+      <div class="verification-content">
+        <p class="verification-description">
+          Upload your National ID image to verify your identity as a passenger.
+        </p>
+        <!-- Current Verification Status -->
+        <div class="verification-status-section">
+          <label>Current Status:</label>
+          <span class="verification-status-badge" [class]="getNationalIdVerificationClass()">
+            {{ getNationalIdVerificationStatus() }}
+          </span>
+        </div>
+        <div class="file-upload-section">
+          <div class="file-input-wrapper">
+            <input 
+              type="file" 
+              id="nationalIdFile"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="file-input"
+              [disabled]="!canUploadNationalId()"
+            />
+            <label for="nationalIdFile" class="file-input-label" [class.disabled-label]="!canUploadNationalId()">
+              <span class="upload-icon">📁</span>
+              <span class="upload-text">
+                {{ selectedFile ? selectedFile.name : 'Choose National ID Image' }}
+              </span>
+            </label>
+          </div>
+          
+          <button 
+            type="button" 
+            class="verify-btn"
+            [disabled]="!selectedFile || isVerifying || !canUploadNationalId()"
+            (click)="verifyNationalId()"
+          >
+            <span *ngIf="!isVerifying">Verify National ID</span>
+            <span *ngIf="isVerifying">Verifying...</span>
+          </button>
+        </div>
+        <div *ngIf="!canUploadNationalId()" class="upload-blocked-message">
+          <span>You cannot upload a new National ID image while your verification is in progress or approved.</span>
+        </div>
+        <!-- Verification Message -->
+        <div class="verification-message" *ngIf="verificationMessage">
+          <div class="message" [class.success]="verificationSuccess" [class.error]="!verificationSuccess">
+            {{ verificationMessage }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No User Data Message -->
+  <div class="no-data-message" *ngIf="!userData">
+    <div class="message-container">
+      <h3>No User Data Available</h3>
+      <p>Please log in to view your profile information.</p>
+    </div>
+  </div>
+
+  <!-- Logout Button at Bottom Right (not fixed) -->
+  <div class="logout-container-bottom">
+    <button class="logout-text-btn-bottom" (click)="logout()">
+      <span class="profile-icon">👤</span>
+      <span class="logout-text">Logout</span>
+    </button>
+  </div>
+</div>
