@@ -30,7 +30,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
             ],
             "scripts": []
           },

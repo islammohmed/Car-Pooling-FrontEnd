@@ -112,17 +112,7 @@
           </div>
         </div>
 
-        <!-- Debug Info -->
-        <div class="debug-info">
-          <small>Selected receiverId: {{ feedbackForm.value.receiverId }}</small>
-          <br>
-          <small>Trip ID: {{ tripId }}</small>
-          <br>
-          <small>Driver ID: {{ trip?.driverId }}</small>
-          <small *ngIf="participants && participants.length > 0">
-            <br>First participant ID: {{ participants[0]?.userId }}
-          </small>
-        </div>
+      
 
         <button type="submit" class="submit-btn pulse-animation" [disabled]="isSubmitting">
           <i class="fas fa-paper-plane"></i>
