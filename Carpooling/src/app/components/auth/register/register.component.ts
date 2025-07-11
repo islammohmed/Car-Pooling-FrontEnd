@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { NotificationService } from '../../../services/notification.service';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 interface RegisterRequest {
   email: string;
@@ -48,7 +49,7 @@ export class RegisterComponent implements OnInit {
   showConfirmPassword = false;
   isLoading = false;
 
-  private apiUrl = 'http://localhost:5140/api/Auth/register';
+  private apiUrl = `${environment.apiUrl}/Auth/register`;
 
   constructor(
     private fb: FormBuilder,

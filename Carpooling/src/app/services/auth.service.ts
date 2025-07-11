@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RegisterRequest {
   email: string;
@@ -70,7 +71,7 @@ export interface DocumentVerificationsResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:5140/api';
+  private baseUrl = environment.apiUrl;
   authChange = new EventEmitter<boolean>();
 
   constructor(private http: HttpClient) {}

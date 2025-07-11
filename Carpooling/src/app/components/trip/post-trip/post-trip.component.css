@@ -8,6 +8,15 @@
   margin: 0 auto;
 }
 
+#autocomplete {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
 .post-trip-card {
   background: white;
   border-radius: 20px;
@@ -256,4 +265,9 @@
   .form-row {
     flex-direction: column;
   }
+}
+.locationLabel {
+  font-weight: 500;
+  color: #2d3748;
+  font-size: 14px;
 }

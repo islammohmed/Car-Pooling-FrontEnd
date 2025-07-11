@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,8 @@ import { DocumentVerificationDto } from '../../../model/user.model';
 import { NotificationService } from '../../../services/notification.service';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { FooterComponent } from '../../shared/footer/footer.component';
+import { environment } from '../../../../environments/environment';
+import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 
 @Component({
   selector: 'app-post-trip',
@@ -19,7 +21,10 @@ import { FooterComponent } from '../../shared/footer/footer.component';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NavbarComponent, FooterComponent]
 })
-export class PostTripComponent implements OnInit {
+export class PostTripComponent implements OnInit, AfterViewChecked {
+  @ViewChild('autocompleteContainer') autocompleteContainerRef!: ElementRef;
+
+  private autocompleteInitialized = false;
   tripForm: FormGroup;
   isSubmitting = false;
   isVerified = false;
@@ -42,6 +47,10 @@ export class PostTripComponent implements OnInit {
     
     this.tripForm = this.fb.group({
       sourceLocation: ['', [Validators.required]],
+      sourceLatitude: [0, [Validators.required]],
+      sourceLongitude: [0, [Validators.required]],
+      sourceCity: ['', [Validators.required]],
+
       destination: ['', [Validators.required]],
       startDate: [this.minDate, [Validators.required]],
       startTime: ['', [Validators.required]],
@@ -81,6 +90,32 @@ export class PostTripComponent implements OnInit {
     // Check if driver is verified
     this.checkDriverVerification();
   }
+
+  ngAfterViewChecked(): void {
+    // Run once after the form is shown and the DOM is ready
+    if (!this.autocompleteInitialized && this.isVerified && !this.isLoading) {
+      const el = this.autocompleteContainerRef?.nativeElement;
+      if (el) {
+        const autocomplete = new GeocoderAutocomplete(
+          el,
+          environment.geoapifyKey
+        );
+        autocomplete.on('select', (location) => {
+          this.tripForm.get('sourceLocation')?.setValue(location.properties.formatted);
+          this.tripForm.get('sourceLatitude')?.setValue(location.properties.lat);
+          this.tripForm.get('sourceLongitude')?.setValue(location.properties.lon);
+          this.tripForm.get('sourceCity')?.setValue(
+            location.properties.country === 'Egypt'
+              ? location.properties.state
+              : location.properties.city
+          );
+        });
+
+        this.autocompleteInitialized = true;
+      }
+    }
+  }
+  
 
   checkDriverVerification(): void {
     this.isLoading = true;
@@ -145,6 +180,9 @@ export class PostTripComponent implements OnInit {
     const tripDto: CreateTripDto = {
       driverId: this.authService.getUserData().id,
       sourceLocation: this.tripForm.value.sourceLocation,
+      sourceLatitude: this.tripForm.value.sourceLatitude,
+      sourceLongitude: this.tripForm.value.sourceLongitude,
+      sourceCity: this.tripForm.value.sourceCity,
       destination: this.tripForm.value.destination,
       startTime: startTime,
       pricePerSeat: this.tripForm.value.pricePerSeat,

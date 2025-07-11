@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface DocumentVerificationDto {
   id: number;
@@ -30,7 +31,8 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class AdminService {
-  private baseUrl = 'http://localhost:5140/api/Admin';
+  
+  private baseUrl = environment.apiUrl + '/Admin';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

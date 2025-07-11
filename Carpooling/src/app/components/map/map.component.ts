@@ -45,8 +45,7 @@ export class MapComponent implements OnInit, OnDestroy {
       });
       let autocomplete = new GeocoderAutocomplete(
         document.getElementById('autocomplete')!,
-        'b17305e1db124fbe9ec3da0776b98f3a',
-        {}
+        'b17305e1db124fbe9ec3da0776b98f3a'
       );
       autocomplete.on('select', (location) => {
         this.destinationLat.set(location.properties.lat);
