@@ -1,5 +1,71 @@
 @import url('leaflet/dist/leaflet.css');
+@import url("@geoapify/geocoder-autocomplete/styles/minimal.css");
+
+.map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
 #map { 
   height: 250px; 
-  width: 50%;
+  width: 90%;
+  max-width: 600px;
+  margin: 1rem auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.autocomplete-wrapper {
+  width: 90%;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.autocomplete-container {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.geocoder-container {
+  width: 100% !important;
+  min-width: 0 !important;
+  z-index: 1000;
+}
+
+.geocoder-container .geoapify-autocomplete-input {
+  width: 100% !important;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.geoapify-autocomplete-items {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  width: 100% !important;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  z-index: 2000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 600px) {
+  #map, .autocomplete-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+  .geoapify-autocomplete-items {
+    font-size: 0.95rem;
+  }
 }
