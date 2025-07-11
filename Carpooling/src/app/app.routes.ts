@@ -7,9 +7,9 @@ import { ProfileComponent } from './profile/profile.component';
 import { MapComponent } from './components/map/map.component';
 
 export const routes: Routes = [
+  { path: 'map', component: MapComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'map', component: MapComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'confirm-email', component: ConfirmEmailComponent },
   { path: 'profile', component: ProfileComponent },
