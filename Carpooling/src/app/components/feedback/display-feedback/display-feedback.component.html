@@ -1,0 +1,82 @@
+<div class="display-feedback-container">
+  <!-- Navbar -->
+  <app-navbar></app-navbar>
+
+  <div class="content-wrapper">
+    <div class="feedback-card">
+      <div class="feedback-header">
+        <h2>User Feedback</h2>
+        <p>See what others are saying about this user</p>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-container">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading feedback...</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && feedbackSummary" class="feedback-summary">
+        <div class="user-info">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="user-details">
+            <h3>{{ feedbackSummary.fullName }}</h3>
+            <div class="rating-display">
+              <div class="stars">
+                <i *ngFor="let star of [1, 2, 3, 4, 5]" class="fas" 
+                  [ngClass]="{'fa-star': star <= feedbackSummary.averageRating, 'fa-star-o': star > feedbackSummary.averageRating}"></i>
+              </div>
+              <span class="rating-value">{{ feedbackSummary.averageRating | number:'1.1-1' }}</span>
+              <span class="total-reviews">({{ feedbackSummary.totalFeedbacks }} reviews)</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="feedbackSummary.recentFeedbacks.length === 0" class="no-feedback">
+          <i class="fas fa-comment-slash"></i>
+          <p>No feedback yet</p>
+        </div>
+
+        <div *ngIf="feedbackSummary.recentFeedbacks.length > 0" class="feedback-list">
+          <h3>Recent Feedback</h3>
+          
+          <div *ngFor="let feedback of feedbackSummary.recentFeedbacks" class="feedback-item">
+            <div class="feedback-header">
+              <div class="feedback-user">
+                <i class="fas fa-user-circle"></i>
+                <span>{{ feedback.senderName }}</span>
+              </div>
+              <div class="feedback-trip">
+                <i class="fas fa-route"></i>
+                <span>{{ feedback.tripSource }} to {{ feedback.tripDestination }}</span>
+              </div>
+              <div class="feedback-date">
+                <i class="fas fa-calendar"></i>
+                <span>{{ feedback.tripStartTime | date:'MMM d, y' }}</span>
+              </div>
+            </div>
+            
+            <div class="feedback-rating">
+              <div class="stars">
+                <i *ngFor="let star of [1, 2, 3, 4, 5]" class="fas" 
+                  [ngClass]="{'fa-star': star <= feedback.rating, 'fa-star-o': star > feedback.rating}"></i>
+              </div>
+            </div>
+            
+            <div class="feedback-comment">
+              <p>{{ feedback.comment }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

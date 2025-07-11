@@ -1,0 +1,123 @@
+<div class="home-container">
+  <!-- Navbar -->
+  <app-navbar></app-navbar>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>Travel Together, Save Together</h1>
+      <p>Join our carpooling community to reduce costs, traffic, and emissions while making new connections.</p>
+      
+      <div class="hero-buttons">
+        <a routerLink="/trip/search" class="btn btn-primary">
+          <i class="fas fa-search"></i>
+          Search for a Trip
+        </a>
+        
+        <a *ngIf="isDriver()" routerLink="/trip/post" class="btn btn-secondary">
+          <i class="fas fa-plus-circle"></i>
+          Post a Trip
+        </a>
+        
+        <button *ngIf="isPassenger()" (click)="navigateToBecomingDriver()" class="btn btn-secondary">
+          <i class="fas fa-id-card"></i>
+          Become a Driver
+        </button>
+        
+        <a routerLink="/delivery/create" class="btn btn-secondary">
+          <i class="fas fa-box"></i>
+          Create Delivery Request
+        </a>
+
+        <a *ngIf="isLoggedIn()" routerLink="/delivery/my-requests" class="btn btn-secondary">
+          <i class="fas fa-list-alt"></i>
+          My Delivery Requests
+        </a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img [src]="'./assets/images/CarPooling.png'" alt="Carpooling Illustration">
+    </div>
+  </section>
+
+  <!-- Trip Search Section -->
+  <section class="search-section">
+    <div class="section-header">
+      <h2>Find Your Next Ride</h2>
+      <p>Search for available trips and connect with drivers heading your way.</p>
+    </div>
+    
+    <app-trip-search></app-trip-search>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <div class="section-header">
+      <h2>How It Works</h2>
+      <p>Simple steps to start carpooling with us</p>
+    </div>
+    
+    <div class="steps-container">
+      <div class="step">
+        <div class="step-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <h3>Create an Account</h3>
+        <p>Sign up and complete your profile to join our community.</p>
+      </div>
+      
+      <div class="step">
+        <div class="step-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3>Find a Ride</h3>
+        <p>Search for trips matching your route and schedule.</p>
+      </div>
+      
+      <div class="step">
+        <div class="step-icon">
+          <i class="fas fa-handshake"></i>
+        </div>
+        <h3>Connect & Go</h3>
+        <p>Book your seat, meet your driver, and enjoy the ride.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section">
+    <div class="section-header">
+      <h2>Why Choose Carpooling?</h2>
+      <p>Benefits for both passengers and drivers</p>
+    </div>
+    
+    <div class="benefits-container">
+      <div class="benefit">
+        <i class="fas fa-money-bill-wave"></i>
+        <h3>Save Money</h3>
+        <p>Share fuel costs and reduce transportation expenses.</p>
+      </div>
+      
+      <div class="benefit">
+        <i class="fas fa-leaf"></i>
+        <h3>Eco-Friendly</h3>
+        <p>Reduce carbon emissions and help protect the environment.</p>
+      </div>
+      
+      <div class="benefit">
+        <i class="fas fa-users"></i>
+        <h3>Build Community</h3>
+        <p>Meet new people and make connections along your route.</p>
+      </div>
+      
+      <div class="benefit">
+        <i class="fas fa-clock"></i>
+        <h3>Save Time</h3>
+        <p>Access carpool lanes and reduce traffic congestion.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

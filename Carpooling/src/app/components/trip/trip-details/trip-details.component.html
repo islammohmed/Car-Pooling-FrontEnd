@@ -1,0 +1,391 @@
+<app-navbar></app-navbar>
+
+<div class="trip-details-page">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <p>Loading trip details...</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert-container">
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle me-2"></i>
+      {{ successMessage }}
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !successMessage" class="alert-container">
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      {{ error }}
+      <div *ngIf="error.includes('email is not confirmed')" class="mt-2">
+        <a routerLink="/confirm-email" class="btn btn-sm btn-outline-danger">Confirm Email</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip Details Content -->
+  <div *ngIf="trip && !loading" class="container">
+    <div class="trip-header">
+      <div class="back-button">
+        <a [routerLink]="['/trip/my-trips']">
+          <i class="fas fa-arrow-left"></i> Back to My Trips
+        </a>
+      </div>
+      <h1>Trip Details</h1>
+      <div class="trip-status" [ngClass]="getStatusClass(trip.status)">
+        {{ getStatusText(trip.status) }}
+      </div>
+    </div>
+
+    <div class="trip-content">
+      <!-- Trip Route Card -->
+      <div class="card trip-route-card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-route"></i> Trip Route
+          </h5>
+          <div class="route-container">
+            <div class="location-point start">
+              <div class="location-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="location-details">
+                <span class="location-label">Starting Point</span>
+                <h3 class="location-name">{{ trip.source }}</h3>
+              </div>
+            </div>
+            
+            <div class="route-line">
+              <div class="route-dot"></div>
+              <div class="route-dash"></div>
+              <div class="route-dot"></div>
+            </div>
+            
+            <div class="location-point end">
+              <div class="location-icon">
+                <i class="fas fa-flag-checkered"></i>
+              </div>
+              <div class="location-details">
+                <span class="location-label">Destination</span>
+                <h3 class="location-name">{{ trip.destination }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trip-details-grid">
+        <!-- Trip Info Card -->
+        <div class="card trip-info-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-info-circle"></i> Trip Information
+            </h5>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Date</span>
+                  <span class="info-value">{{ trip.departureTime | date:'MMM d, y' }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Time</span>
+                  <span class="info-value">{{ trip.departureTime | date:'h:mm a' }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Price per Seat</span>
+                  <span class="info-value">{{ trip.price | currency:'EGP':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-chair"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Available Seats</span>
+                  <span class="info-value">{{ trip.availableSeats }}</span>
+                </div>
+              </div>
+              
+              <!-- Add booked seats info for driver -->
+              <div class="info-item" *ngIf="isTripDriver() && trip.participants">
+                <div class="info-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Booked Seats</span>
+                  <span class="info-value">{{ getBookedSeatsCount() }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="trip-description" *ngIf="trip.description">
+              <h6>Description</h6>
+              <p>{{ trip.description }}</p>
+            </div>
+            <div class="trip-description" *ngIf="!trip.description">
+              <h6>Description</h6>
+              <p class="text-muted">No description provided</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver Info Card -->
+        <div class="card driver-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-user"></i> Driver Information
+            </h5>
+            
+            <div class="driver-profile">
+              <div class="driver-avatar">
+                <img *ngIf="getDriver() && getDriver()?.profileImage && getDriver()?.profileImage !== 'string'" [src]="getDriver()?.profileImage" alt="Profile" class="profile-image">
+                <i *ngIf="!getDriver() || !getDriver()?.profileImage || getDriver()?.profileImage === 'string'" class="fas fa-user-circle"></i>
+              </div>
+              <div class="driver-details">
+                <h4 class="driver-name">{{ trip.driverName }}</h4>
+                <div class="driver-rating">
+                  <div class="stars">
+                    <i *ngFor="let star of [1,2,3,4,5]" 
+                       class="fas" 
+                       [ngClass]="star <= getDriverRating() ? 'fa-star' : 'fa-star-o'"></i>
+                  </div>
+                  <span class="rating-value">{{ getDriverRating() | number:'1.1-1' }}</span>
+                  <a *ngIf="trip.driverId" [routerLink]="['/feedback/display', trip.driverId]" class="view-feedback-link">
+                    <i class="fas fa-comments"></i> View Feedback
+                  </a>
+                </div>
+                <!-- Add phone number if available -->
+                <span class="passenger-contact" *ngIf="getDriver() && getDriver()?.phoneNumber">
+                  <i class="fas fa-phone"></i> {{ getDriver()?.phoneNumber }}
+                </span>
+              </div>
+            </div>
+            
+            <div *ngIf="isTripDriver()" class="driver-badge">
+              <i class="fas fa-check-circle"></i> You are the driver
+            </div>
+            <!-- Driver Actions Section -->
+            <div *ngIf="isTripDriver()" class="driver-actions mt-3">
+              <!-- Complete Trip Button (for driver when trip is Confirmed) -->
+              <button *ngIf="trip.status === 'Confirmed'" class="btn btn-complete-trip w-100 mb-3" (click)="completeTrip()" [disabled]="isSubmitting">
+                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <i class="fas fa-flag-checkered me-2"></i> Complete Trip
+              </button>
+              
+              <!-- Cancel Trip Button (for driver when trip is Pending) -->
+              <button *ngIf="isPendingTrip() || trip.status === 'Pending'" class="btn btn-danger" (click)="showCancelTripForm()" [disabled]="isSubmitting">
+                <i class="fas fa-times-circle me-2"></i> Cancel Trip
+              </button>
+            </div>
+            
+            <!-- Cancel Trip Form (for driver) -->
+            <div *ngIf="showCancelForm && isTripDriver()" class="cancel-trip-form mt-3">
+              <h6 class="mb-3"><i class="fas fa-exclamation-triangle text-danger"></i> Cancel Trip</h6>
+              <form [formGroup]="cancelTripForm" (ngSubmit)="cancelTrip()">
+                <div class="form-group mb-3">
+                  <label for="cancellationReason" class="form-label">Cancellation Reason <span class="text-danger">*</span></label>
+                  <textarea 
+                    class="form-control" 
+                    id="cancellationReason" 
+                    formControlName="cancellationReason"
+                    rows="3" 
+                    placeholder="Please provide a reason for cancellation">
+                  </textarea>
+                  <div *ngIf="cancelTripForm.get('cancellationReason')?.invalid && cancelTripForm.get('cancellationReason')?.touched" class="form-error">
+                    <small *ngIf="cancelTripForm.get('cancellationReason')?.errors?.['required']">Cancellation reason is required</small>
+                    <small *ngIf="cancelTripForm.get('cancellationReason')?.errors?.['minlength']">Reason must be at least 10 characters</small>
+                  </div>
+                  <div class="form-text text-muted">
+                    This reason will be shared with all passengers who booked this trip.
+                  </div>
+                </div>
+                <div class="cancel-actions">
+                  <button type="button" class="btn btn-outline-secondary me-2" (click)="hideCancelTripForm()">
+                    <i class="fas fa-times me-1"></i> Never Mind
+                  </button>
+                  <button type="submit" class="btn btn-danger" [disabled]="cancelTripForm.invalid || isSubmitting">
+                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <i class="fas fa-times-circle me-1"></i> Confirm Cancellation
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Card -->
+        <div class="card booking-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-ticket-alt"></i> Booking
+            </h5>
+            
+            <!-- Driver viewing own trip - show this first to override other messages -->
+            <div *ngIf="isTripDriver() && !checkingBooking" class="booking-message info">
+              <i class="fas fa-info-circle"></i>
+              <p>You are the driver of this trip.</p>
+            </div>
+            
+            <!-- Only show these messages if NOT the driver -->
+            <ng-container *ngIf="!isTripDriver()">
+              <!-- Checking booking status -->
+              <div *ngIf="checkingBooking" class="booking-message info">
+                <div class="spinner-border spinner-border-sm me-2" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Checking booking status...</p>
+              </div>
+              
+              <!-- Not logged in -->
+              <div *ngIf="!isLoggedIn() && !checkingBooking" class="booking-message info">
+                <i class="fas fa-info-circle"></i>
+                <p>Please <a routerLink="/login">login</a> to book this trip.</p>
+              </div>
+              
+              <!-- Already booked -->
+              <div *ngIf="isAlreadyBooked() && !checkingBooking" class="booking-message success">
+                <i class="fas fa-check-circle"></i>
+                <p>You have already booked this trip.</p>
+              </div>
+              
+              <!-- No seats available -->
+              <div *ngIf="trip.availableSeats <= 0 && trip.status === 'Pending' && !checkingBooking" class="booking-message warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>No seats available for this trip.</p>
+              </div>
+              
+              <!-- Trip not pending -->
+              <div *ngIf="trip.status !== 'Pending' && !checkingBooking && !isAlreadyBooked()" class="booking-message info">
+                <i class="fas fa-info-circle"></i>
+                <p>This trip is {{ getStatusText(trip.status).toLowerCase() }} and cannot be booked.</p>
+              </div>
+              
+              <!-- Booking form -->
+              <div *ngIf="isLoggedIn() && !isAlreadyBooked() && trip.status === 'Pending' && trip.availableSeats > 0 && !checkingBooking" class="booking-form">
+                <form [formGroup]="bookingForm" (ngSubmit)="bookTrip()">
+                  <div class="form-group">
+                    <label for="seatCount">Number of Seats</label>
+                    <div class="seat-selector">
+                      <button type="button" class="btn-seat" 
+                              [disabled]="bookingForm.get('seatCount')?.value <= 1"
+                              (click)="bookingForm.get('seatCount')?.setValue(bookingForm.get('seatCount')?.value - 1)">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <input type="number" 
+                             id="seatCount" 
+                             formControlName="seatCount" 
+                             class="seat-input" 
+                             min="1" 
+                             [max]="trip.availableSeats">
+                      <button type="button" class="btn-seat" 
+                              [disabled]="bookingForm.get('seatCount')?.value >= trip.availableSeats"
+                              (click)="bookingForm.get('seatCount')?.setValue(bookingForm.get('seatCount')?.value + 1)">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                    <div *ngIf="bookingForm.get('seatCount')?.invalid && bookingForm.get('seatCount')?.touched" class="form-error">
+                      <small *ngIf="bookingForm.get('seatCount')?.errors?.['required']">Number of seats is required</small>
+                      <small *ngIf="bookingForm.get('seatCount')?.errors?.['min']">Minimum 1 seat required</small>
+                      <small *ngIf="bookingForm.get('seatCount')?.errors?.['max']">Maximum {{ trip.availableSeats }} seats available</small>
+                    </div>
+                  </div>
+                  
+                  <div class="price-summary">
+                    <div class="price-row">
+                      <span>Price per seat:</span>
+                      <span>{{ trip.price | currency:'EGP':'symbol':'1.0-0' }}</span>
+                    </div>
+                    <div class="price-row">
+                      <span>Number of seats:</span>
+                      <span>{{ bookingForm.get('seatCount')?.value }}</span>
+                    </div>
+                    <div class="price-divider"></div>
+                    <div class="price-row total">
+                      <span>Total:</span>
+                      <span>{{ (trip.price * bookingForm.get('seatCount')?.value) | currency:'EGP':'symbol':'1.0-0' }}</span>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    class="btn-book" 
+                    [disabled]="isSubmitting || bookingForm.invalid"
+                  >
+                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Book Now
+                  </button>
+                </form>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passengers Section (for driver and passengers) -->
+      <div class="card passengers-card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-users"></i> Passengers
+          </h5>
+          
+          <div class="passengers-list" *ngIf="trip.participants && getPassengers().length > 0">
+            <div class="passenger-item" *ngFor="let participant of getPassengers()">
+              <div class="passenger-avatar">
+                <img *ngIf="participant.profileImage && participant.profileImage !== 'string'" [src]="participant.profileImage" alt="Profile" class="profile-image">
+                <i *ngIf="!participant.profileImage || participant.profileImage === 'string'" class="fas fa-user"></i>
+              </div>
+              <div class="passenger-info">
+                <span class="passenger-name">{{ participant.userName }}</span>
+                <span class="passenger-status" [ngClass]="{
+                  'pending': participant.joinStatus === JoinStatus.Pending,
+                  'approved': participant.joinStatus === JoinStatus.Approved,
+                  'rejected': participant.joinStatus === JoinStatus.Rejected
+                }">
+                  {{ participant.joinStatus === JoinStatus.Pending ? 'Pending' : 
+                     participant.joinStatus === JoinStatus.Approved ? 'Approved' : 'Rejected' }}
+                </span>
+                <span class="passenger-seats" *ngIf="participant.seatCount && participant.seatCount > 1">
+                  <i class="fas fa-chair"></i> {{ participant.seatCount }} seats
+                </span>
+                <span class="passenger-contact" *ngIf="isTripDriver() && participant.phoneNumber">
+                  <i class="fas fa-phone"></i> {{ participant.phoneNumber }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="!trip.participants || getPassengers().length === 0" class="no-passengers">
+            <i class="fas fa-user-slash"></i>
+            <p>No passengers have booked this trip yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer> 

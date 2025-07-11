@@ -1,0 +1,282 @@
+.pending-deliveries-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.pending-deliveries-card {
+  width: 100%;
+  max-width: 900px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.header {
+  background-color: #4a6cf7;
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.logo i {
+  font-size: 1.8rem;
+  margin-right: 0.5rem;
+}
+
+.logo span {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header p {
+  margin: 0.5rem 0 0;
+  opacity: 0.9;
+}
+
+/* Trip filter info styles */
+.trip-filter-info {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.trip-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trip-details h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #495057;
+}
+
+.trip-route {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trip-route i {
+  color: #4a6cf7;
+}
+
+.trip-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trip-date i {
+  color: #4a6cf7;
+}
+
+.trip-filter-info button {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+}
+
+/* Alert styles */
+.alert {
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.alert i {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Loading spinner */
+.loading {
+  padding: 2rem;
+  text-align: center;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #4a6cf7;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: #adb5bd;
+  margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p, .empty-state span {
+  color: #6c757d;
+}
+
+/* Request cards */
+.requests-list {
+  padding: 1rem;
+}
+
+.request-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #e9ecef;
+}
+
+.request-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.request-details {
+  padding: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.detail-label {
+  width: 100px;
+  font-weight: 500;
+}
+
+.detail-value {
+  flex: 1;
+}
+
+.detail-value.description {
+  white-space: pre-wrap;
+}
+
+.trip-selection {
+  padding: 1rem;
+  background-color: #e9ecef;
+  border-top: 1px solid #dee2e6;
+}
+
+.trip-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.request-actions {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #dee2e6;
+}
+
+.accept-btn {
+  background-color: #4a6cf7;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.accept-btn:hover {
+  background-color: #3a5bd9;
+}
+
+.accept-btn:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.accept-btn i {
+  margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pending-deliveries-container {
+    padding: 1rem;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+  }
+  
+  .detail-label {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+} 

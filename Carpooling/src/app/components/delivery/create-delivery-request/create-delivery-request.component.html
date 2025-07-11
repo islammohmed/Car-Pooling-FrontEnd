@@ -1,0 +1,167 @@
+<app-navbar></app-navbar>
+<div class="delivery-container">
+  <div class="delivery-card">
+    <div class="delivery-header">
+      <div class="logo">
+        <i class="fas fa-box"></i>
+        <span>CarPooling</span>
+      </div>
+      <h2>Create Delivery Request</h2>
+      <p>Fill in the details to create a new delivery request</p>
+    </div>
+
+    <form [formGroup]="deliveryForm" (ngSubmit)="onSubmit()" class="delivery-form">
+      <div class="form-group">
+        <label for="sourceLocation">Source Location</label>
+        <div class="input-wrapper">
+          <i class="fas fa-map-marker-alt"></i>
+          <input 
+            type="text" 
+            id="sourceLocation" 
+            formControlName="sourceLocation" 
+            placeholder="Enter pickup location"
+            [ngClass]="{'error': deliveryForm.get('sourceLocation')?.invalid && deliveryForm.get('sourceLocation')?.touched}"
+          >
+        </div>
+        <div class="error-message" *ngIf="deliveryForm.get('sourceLocation')?.invalid && deliveryForm.get('sourceLocation')?.touched">
+          Source location is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dropoffLocation">Dropoff Location</label>
+        <div class="input-wrapper">
+          <i class="fas fa-map-pin"></i>
+          <input 
+            type="text" 
+            id="dropoffLocation" 
+            formControlName="dropoffLocation" 
+            placeholder="Enter delivery location"
+            [ngClass]="{'error': deliveryForm.get('dropoffLocation')?.invalid && deliveryForm.get('dropoffLocation')?.touched}"
+          >
+        </div>
+        <div class="error-message" *ngIf="deliveryForm.get('dropoffLocation')?.invalid && deliveryForm.get('dropoffLocation')?.touched">
+          Dropoff location is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="receiverPhone">Receiver's Phone</label>
+        <div class="input-wrapper">
+          <i class="fas fa-phone"></i>
+          <input 
+            type="tel" 
+            id="receiverPhone" 
+            formControlName="receiverPhone" 
+            placeholder="Enter receiver's phone number"
+            [ngClass]="{'error': deliveryForm.get('receiverPhone')?.invalid && deliveryForm.get('receiverPhone')?.touched}"
+          >
+        </div>
+        <div class="error-message" *ngIf="deliveryForm.get('receiverPhone')?.invalid && deliveryForm.get('receiverPhone')?.touched">
+          Please enter a valid phone number
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half-width">
+          <label for="weight">Weight (kg)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-weight"></i>
+            <input 
+              type="number" 
+              id="weight" 
+              formControlName="weight" 
+              placeholder="Package weight in kg"
+              [ngClass]="{'error': deliveryForm.get('weight')?.invalid && deliveryForm.get('weight')?.touched}"
+            >
+          </div>
+          <div class="error-message" *ngIf="deliveryForm.get('weight')?.invalid && deliveryForm.get('weight')?.touched">
+            Weight must be between 0.1 and 100 kg
+          </div>
+        </div>
+
+        <div class="form-group half-width">
+          <label for="price">Price</label>
+          <div class="input-wrapper">
+            <i class="fas fa-dollar-sign"></i>
+            <input 
+              type="number" 
+              id="price" 
+              formControlName="price" 
+              placeholder="Delivery price"
+              [ngClass]="{'error': deliveryForm.get('price')?.invalid && deliveryForm.get('price')?.touched}"
+            >
+          </div>
+          <div class="error-message" *ngIf="deliveryForm.get('price')?.invalid && deliveryForm.get('price')?.touched">
+            Price must be between 0 and 10000
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="itemDescription">Item Description</label>
+        <div class="input-wrapper">
+          <i class="fas fa-info-circle"></i>
+          <input 
+            type="text" 
+            id="itemDescription" 
+            formControlName="itemDescription" 
+            placeholder="Describe the item to be delivered"
+            [ngClass]="{'error': deliveryForm.get('itemDescription')?.invalid && deliveryForm.get('itemDescription')?.touched}"
+          >
+        </div>
+        <div class="error-message" *ngIf="deliveryForm.get('itemDescription')?.invalid && deliveryForm.get('itemDescription')?.touched">
+          Item description is required
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half-width">
+          <label for="deliveryStartDate">Delivery Start Date</label>
+          <div class="input-wrapper">
+            <i class="fas fa-calendar-alt"></i>
+            <input 
+              type="datetime-local" 
+              id="deliveryStartDate" 
+              formControlName="deliveryStartDate" 
+              [min]="minDate"
+              [ngClass]="{'error': deliveryForm.get('deliveryStartDate')?.invalid && deliveryForm.get('deliveryStartDate')?.touched}"
+            >
+          </div>
+          <div class="error-message" *ngIf="deliveryForm.get('deliveryStartDate')?.invalid && deliveryForm.get('deliveryStartDate')?.touched">
+            Delivery start date is required
+          </div>
+        </div>
+
+        <div class="form-group half-width">
+          <label for="deliveryEndDate">Delivery End Date</label>
+          <div class="input-wrapper">
+            <i class="fas fa-calendar-check"></i>
+            <input 
+              type="datetime-local" 
+              id="deliveryEndDate" 
+              formControlName="deliveryEndDate" 
+              [min]="minDate"
+              [ngClass]="{'error': deliveryForm.get('deliveryEndDate')?.invalid && deliveryForm.get('deliveryEndDate')?.touched}"
+            >
+          </div>
+          <div class="error-message" *ngIf="deliveryForm.get('deliveryEndDate')?.invalid && deliveryForm.get('deliveryEndDate')?.touched">
+            <span *ngIf="deliveryForm.get('deliveryEndDate')?.errors?.['required']">Delivery end date is required</span>
+            <span *ngIf="deliveryForm.get('deliveryEndDate')?.errors?.['endDateBeforeStartDate']">End date must be after start date</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button 
+        type="submit" 
+        class="delivery-btn" 
+        [disabled]="deliveryForm.invalid || isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Create Delivery Request</span>
+        <span *ngIf="isSubmitting">Processing...</span>
+      </button>
+    </form>
+  </div>
+</div> 

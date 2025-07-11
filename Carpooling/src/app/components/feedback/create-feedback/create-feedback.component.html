@@ -1,0 +1,140 @@
+<div class="feedback-container">
+  <!-- Navbar -->
+  <app-navbar></app-navbar>
+
+  <div class="content-wrapper">
+    <div class="feedback-card">
+      <div class="feedback-header">
+        <h2><i class="fas fa-star-half-alt"></i> Leave Feedback</h2>
+        <p>Share your experience about this trip and help others make informed decisions</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div *ngIf="successMessage" class="success-alert">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ successMessage }}</span>
+        <button class="btn-back" (click)="goBack()">Back to Trips</button>
+      </div>
+
+      <form *ngIf="!successMessage" [formGroup]="feedbackForm" (ngSubmit)="onSubmit()" class="feedback-form">
+        <!-- Trip Details -->
+        <div class="trip-details" *ngIf="trip">
+          <div class="trip-route">
+            <span class="source">{{ trip.source }}</span>
+            <i class="fas fa-arrow-right"></i>
+            <span class="destination">{{ trip.destination }}</span>
+          </div>
+          <div class="trip-date">
+            <i class="fas fa-calendar-alt"></i>
+            <span>{{ trip.departureTime | date:'MMM d, y' }}</span>
+          </div>
+        </div>
+
+        <!-- Single participant (driver) - Show without dropdown -->
+        <div class="form-group user-selection" *ngIf="participants && participants.length === 1">
+          <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="user-info">
+            <h4>Rating {{ participants[0].userName }}</h4>
+            <p>How was your experience?</p>
+          </div>
+          <input type="hidden" formControlName="receiverId" [value]="participants[0].userId">
+        </div>
+
+        <!-- User Selection - Only show if there's more than one participant -->
+        <div class="form-group" *ngIf="participants && participants.length > 1">
+          <label for="receiverId">Who are you rating?</label>
+          <div class="select-wrapper">
+            <i class="fas fa-user"></i>
+            <select 
+              id="receiverId" 
+              formControlName="receiverId"
+              [ngClass]="{'error': isInvalid('receiverId')}"
+              required
+            >
+              <option value="" disabled>Select a person to rate</option>
+              <option *ngFor="let participant of participants" [value]="participant.userId">
+                {{ participant.userName }}
+              </option>
+            </select>
+          </div>
+          <div *ngIf="isInvalid('receiverId')" class="error-message">
+            Please select a user to rate
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="form-group rating-section">
+          <label>Your Rating</label>
+          <div class="rating-stars">
+            <div class="star-container" *ngFor="let star of [1, 2, 3, 4, 5]">
+              <i 
+                class="fas" 
+                [ngClass]="{'fa-star': star <= rating, 'fa-star-o': star > rating}"
+                (click)="setRating(star)"
+                (mouseenter)="hoverRating = star" 
+                (mouseleave)="hoverRating = 0"
+                [style.color]="star <= (hoverRating || rating) ? '#FFD700' : '#ccc'"
+                [style.transform]="star <= (hoverRating || rating) ? 'scale(1.2)' : 'scale(1)'"
+                [style.transition]="'all 0.2s ease-in-out'"
+              ></i>
+            </div>
+          </div>
+          <div class="rating-text" [ngClass]="{'excellent': rating === 5, 'good': rating === 4, 'average': rating === 3, 'fair': rating === 2, 'poor': rating === 1}">
+            {{ rating === 5 ? 'Excellent!' : 
+               rating === 4 ? 'Very Good' : 
+               rating === 3 ? 'Good' : 
+               rating === 2 ? 'Fair' : 
+               rating === 1 ? 'Poor' : '' }}
+          </div>
+          <div *ngIf="isInvalid('rating')" class="error-message">
+            Please select a rating
+          </div>
+        </div>
+
+        <!-- Comment -->
+        <div class="form-group">
+          <label for="comment">Share Your Experience</label>
+          <textarea 
+            id="comment" 
+            formControlName="comment"
+            [ngClass]="{'error': isInvalid('comment')}"
+            placeholder="Tell us about your trip experience..."
+            rows="4"
+          ></textarea>
+          <div *ngIf="isInvalid('comment')" class="error-message">
+            Please provide a comment (min 5 characters)
+          </div>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="debug-info">
+          <small>Selected receiverId: {{ feedbackForm.value.receiverId }}</small>
+          <br>
+          <small>Trip ID: {{ tripId }}</small>
+          <br>
+          <small>Driver ID: {{ trip?.driverId }}</small>
+          <small *ngIf="participants && participants.length > 0">
+            <br>First participant ID: {{ participants[0]?.userId }}
+          </small>
+        </div>
+
+        <button type="submit" class="submit-btn pulse-animation" [disabled]="isSubmitting">
+          <i class="fas fa-paper-plane"></i>
+          <span *ngIf="!isSubmitting">Submit Feedback</span>
+          <span *ngIf="isSubmitting">
+            <i class="fas fa-spinner fa-spin"></i> Submitting...
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

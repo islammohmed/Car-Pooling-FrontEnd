@@ -1,0 +1,108 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <div>
+      <a class="back-button" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i> Back to Documents
+      </a>
+      <h1 class="admin-title">Document Verification</h1>
+    </div>
+  </header>
+
+  <div class="admin-content">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="empty-state">
+      <p>Loading user documents...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="error && !loading" class="empty-state">
+      <i class="fa fa-exclamation-circle"></i>
+      <h3>Error</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadUserDocuments()">
+        Try Again
+      </button>
+    </div>
+
+    <!-- User documents -->
+    <div *ngIf="!loading && !error" class="card">
+      <!-- User info -->
+      <div class="user-info">
+        <div class="user-avatar">
+          {{ getUserInitials() }}
+        </div>
+        <div class="user-details">
+          <h3>{{ userName }}</h3>
+          <p>User ID: {{ userId }}</p>
+        </div>
+      </div>
+
+      <!-- Action messages -->
+      <div *ngIf="actionSuccess" class="alert alert-success">
+        {{ actionSuccess }}
+      </div>
+      <div *ngIf="actionError" class="alert alert-danger">
+        {{ actionError }}
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="documents.length === 0" class="empty-state">
+        <i class="fa fa-folder-open"></i>
+        <h3>No Documents Found</h3>
+        <p>This user has no documents for verification.</p>
+      </div>
+
+      <!-- Documents grid -->
+      <div *ngIf="documents.length > 0" class="documents-grid">
+        <div *ngFor="let doc of documents" class="document-card">
+          <img [src]="doc.documentImage" alt="{{ doc.documentType }}" class="document-image">
+          <div class="document-content">
+            <div class="document-header">
+              <h3 class="document-type">{{ doc.documentType }}</h3>
+              <span class="document-status" [ngClass]="getStatusClass(doc.status)">
+                {{ doc.status }}
+              </span>
+            </div>
+            <div class="document-info">
+              <p><span class="label">Submitted:</span> {{ doc.submissionDate | date:'medium' }}</p>
+            </div>
+            
+            <!-- Actions for pending documents -->
+            <div *ngIf="doc.status === 'Pending'" class="document-actions">
+              <button class="btn btn-approve" (click)="approveDocument(doc.id)" [disabled]="processingAction">
+                Approve
+              </button>
+              <button class="btn btn-reject" (click)="showRejectForm(doc.id)" [disabled]="processingAction">
+                Reject
+              </button>
+            </div>
+
+            <!-- Rejection form -->
+            <div *ngIf="showRejectionForm && currentDocumentId === doc.id" class="rejection-form active">
+              <form [formGroup]="rejectionForm" (ngSubmit)="rejectDocument()">
+                <div class="form-group">
+                  <label for="rejectionReason">Reason for Rejection</label>
+                  <textarea 
+                    id="rejectionReason" 
+                    formControlName="rejectionReason" 
+                    placeholder="Explain why this document is being rejected..."></textarea>
+                  <div *ngIf="rejectionForm.get('rejectionReason')?.invalid && rejectionForm.get('rejectionReason')?.touched" class="error-message">
+                    Please provide a detailed reason for rejection (at least 10 characters).
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-outline" (click)="cancelRejection()" [disabled]="processingAction">
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-reject" [disabled]="rejectionForm.invalid || processingAction">
+                    Confirm Rejection
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,106 @@
+<app-navbar></app-navbar>
+<div class="selected-deliveries-container">
+  <div class="selected-deliveries-card">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-car"></i>
+        <span>CarPooling</span>
+      </div>
+      <h2>Selected Delivery Requests</h2>
+      <p>Delivery requests selected for your trips</p>
+    </div>
+
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Loading selected delivery requests...</span>
+    </div>
+
+    <div class="success-message" *ngIf="successMessage">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <div class="deliveries-list" *ngIf="!isLoading && !errorMessage">
+      <div *ngIf="selectedDeliveries.length === 0" class="no-deliveries">
+        <i class="fas fa-box-open"></i>
+        <p>No delivery requests have been selected for your trips.</p>
+        <p class="suggestion">Check back later or view your active trips.</p>
+      </div>
+
+      <div class="delivery-card" *ngFor="let delivery of selectedDeliveries">
+        <div class="delivery-header">
+          <div class="delivery-route">
+            <span class="source">{{ delivery.sourceLocation }}</span>
+            <i class="fas fa-arrow-right"></i>
+            <span class="destination">{{ delivery.dropoffLocation }}</span>
+          </div>
+          <div class="delivery-status" [ngClass]="getStatusClass(delivery.status)">{{ delivery.status }}</div>
+        </div>
+        
+        <div class="delivery-details">
+          <div class="detail">
+            <i class="fas fa-user"></i>
+            <span>Sender: {{ delivery.senderName }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-phone"></i>
+            <span>Receiver: {{ delivery.receiverPhone }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-box"></i>
+            <span>{{ delivery.itemDescription }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-weight-hanging"></i>
+            <span>{{ delivery.weight }} kg</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-dollar-sign"></i>
+            <span>${{ delivery.price }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-calendar"></i>
+            <span>Delivery window: {{ formatDate(delivery.deliveryStartDate) }} - {{ formatDate(delivery.deliveryEndDate) }}</span>
+          </div>
+        </div>
+
+        <div class="delivery-notes" *ngIf="delivery.notes">
+          <h4>Delivery Notes:</h4>
+          <p>{{ delivery.notes }}</p>
+        </div>
+
+        <div class="delivery-actions">
+          <button class="view-btn" (click)="viewDeliveryDetails(delivery.id)">
+            <i class="fas fa-eye"></i>
+            View Details
+          </button>
+          <button class="accept-btn" 
+                 [disabled]="processingRequestId === delivery.id" 
+                 (click)="acceptDelivery(delivery.id, delivery.tripId || 0)">
+            <span *ngIf="processingRequestId === delivery.id" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i class="fas fa-check"></i>
+            Accept
+          </button>
+          <button class="reject-btn" 
+                 [disabled]="processingRequestId === delivery.id" 
+                 (click)="rejectDelivery(delivery.id)">
+            <i class="fas fa-times"></i>
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="back-btn" routerLink="/delivery/driver/my-deliveries">
+        <i class="fas fa-arrow-left"></i>
+        Back to My Deliveries
+      </button>
+    </div>
+  </div>
+</div> 

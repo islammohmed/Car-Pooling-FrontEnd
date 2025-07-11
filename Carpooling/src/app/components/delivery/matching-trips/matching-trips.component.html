@@ -1,0 +1,116 @@
+<app-navbar></app-navbar>
+<div class="matching-trips-container">
+  <div class="matching-trips-card">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-car"></i>
+        <span>CarPooling</span>
+      </div>
+      <h2>Matching Trips</h2>
+      <p *ngIf="deliveryRequest">For your delivery from {{ deliveryRequest.sourceLocation }} to {{ deliveryRequest.dropoffLocation }}</p>
+    </div>
+
+    <div class="delivery-details" *ngIf="deliveryRequest">
+      <h3>Delivery Request Details</h3>
+      <div class="detail-item">
+        <span class="label">Item:</span>
+        <span class="value">{{ deliveryRequest.itemDescription }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="label">Weight:</span>
+        <span class="value">{{ deliveryRequest.weight }} kg</span>
+      </div>
+      <div class="detail-item">
+        <span class="label">Price:</span>
+        <span class="value">${{ deliveryRequest.price }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="label">Status:</span>
+        <span class="status-badge" [ngClass]="deliveryRequest.status.toLowerCase()">{{ deliveryRequest.status }}</span>
+      </div>
+    </div>
+
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Finding matching trips...</span>
+    </div>
+
+    <div class="success-message" *ngIf="successMessage">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <div class="trips-list" *ngIf="!isLoading && !errorMessage">
+      <div *ngIf="matchingTrips.length === 0" class="no-trips">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>No matching trips found for your delivery request.</p>
+        <p class="suggestion">Try again later or modify your delivery details.</p>
+      </div>
+
+      <div class="trip-card" *ngFor="let trip of matchingTrips">
+        <div class="trip-header">
+          <div class="trip-route">
+            <span class="source">{{ trip.sourceLocation }}</span>
+            <i class="fas fa-arrow-right"></i>
+            <span class="destination">{{ trip.destination }}</span>
+          </div>
+          <div class="trip-status" [ngClass]="trip.status.toLowerCase()">{{ trip.status }}</div>
+        </div>
+        
+        <div class="trip-details">
+          <div class="detail">
+            <i class="fas fa-user"></i>
+            <span>{{ trip.driverName }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-clock"></i>
+            <span>{{ formatDate(trip.startTime) }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-hourglass-half"></i>
+            <span>{{ trip.estimatedDuration }}</span>
+          </div>
+          <div class="detail">
+            <i class="fas fa-dollar-sign"></i>
+            <span>${{ trip.pricePerSeat }}</span>
+          </div>
+        </div>
+
+        <div class="trip-description" *ngIf="trip.tripDescription">
+          <p>{{ trip.tripDescription }}</p>
+        </div>
+
+        <div class="notes-section">
+          <label for="delivery-notes">Delivery Notes (optional):</label>
+          <textarea id="delivery-notes" [(ngModel)]="deliveryNotes" 
+                    placeholder="Add any special instructions or notes for the driver"></textarea>
+        </div>
+
+        <div class="trip-footer">
+          <div class="seats-info">
+            <i class="fas fa-users"></i>
+            <span>{{ trip.availableSeats }} seats available</span>
+          </div>
+          <button class="select-trip-btn" 
+                 [disabled]="deliveryRequest?.status !== 'Pending' || isSubmitting" 
+                 (click)="selectTrip(trip.tripId)">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Select Trip
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+        Back to My Requests
+      </button>
+    </div>
+  </div>
+</div> 

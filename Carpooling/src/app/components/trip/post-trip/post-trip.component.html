@@ -1,0 +1,250 @@
+<div class="post-trip-container">
+  <!-- Navbar -->
+  <app-navbar></app-navbar>
+
+  <div class="content-wrapper">
+    <div class="post-trip-card">
+      <div class="post-trip-header">
+        <h2>Post a New Trip</h2>
+        <p>Share your journey and help others travel with you</p>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Checking your verification status...</p>
+      </div>
+
+      <div *ngIf="!isLoading && !isVerified" class="verification-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="warning-content">
+          <h3>Verification Required</h3>
+          <p>You need to verify your documents before posting trips.</p>
+          <button class="btn-verify" (click)="navigateToVerification()">Verify Now</button>
+        </div>
+      </div>
+
+      <form *ngIf="!isLoading && isVerified" [formGroup]="tripForm" (ngSubmit)="onSubmit()" class="post-trip-form">
+        <!-- Error message display -->
+        <div *ngIf="error" class="error-alert">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ error }}
+        </div>
+        
+        <!-- Source and Destination -->
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="sourceLocation">From</label>
+            <div class="input-wrapper">
+              <i class="fas fa-map-marker-alt"></i>
+              <input 
+                type="text" 
+                id="sourceLocation" 
+                formControlName="sourceLocation" 
+                placeholder="Enter pickup location"
+                [ngClass]="{'error': isInvalid('sourceLocation')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('sourceLocation')" class="error-message">
+              Please enter a pickup location
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="destination">To</label>
+            <div class="input-wrapper">
+              <i class="fas fa-map-marker-alt"></i>
+              <input 
+                type="text" 
+                id="destination" 
+                formControlName="destination" 
+                placeholder="Enter destination"
+                [ngClass]="{'error': isInvalid('destination')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('destination')" class="error-message">
+              Please enter a destination
+            </div>
+          </div>
+        </div>
+
+        <!-- Date and Time -->
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="startDate">Date</label>
+            <div class="input-wrapper">
+              <i class="fas fa-calendar"></i>
+              <input 
+                type="date" 
+                id="startDate" 
+                formControlName="startDate"
+                [min]="minDate"
+                [ngClass]="{'error': isInvalid('startDate')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('startDate')" class="error-message">
+              Please select a valid date
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="startTime">Time</label>
+            <div class="input-wrapper">
+              <i class="fas fa-clock"></i>
+              <input 
+                type="time" 
+                id="startTime" 
+                formControlName="startTime"
+                [ngClass]="{'error': isInvalid('startTime')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('startTime')" class="error-message">
+              Please select a valid time
+            </div>
+          </div>
+        </div>
+
+        <!-- Price and Seats -->
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="pricePerSeat">Price per Seat (EGP)</label>
+            <div class="input-wrapper">
+              <i class="fas fa-money-bill"></i>
+              <input 
+                type="number" 
+                id="pricePerSeat" 
+                formControlName="pricePerSeat"
+                placeholder="e.g. 50"
+                min="0"
+                step="0.01"
+                [ngClass]="{'error': isInvalid('pricePerSeat')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('pricePerSeat')" class="error-message">
+              Please enter a valid price
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="availableSeats">Available Seats</label>
+            <div class="input-wrapper">
+              <i class="fas fa-users"></i>
+              <input 
+                type="number" 
+                id="availableSeats" 
+                formControlName="availableSeats"
+                min="1"
+                max="10"
+                [ngClass]="{'error': isInvalid('availableSeats')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('availableSeats')" class="error-message">
+              Please enter a number between 1 and 10
+            </div>
+          </div>
+        </div>
+
+        <!-- Duration and Gender Preference -->
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="estimatedDuration">Estimated Duration (HH:MM)</label>
+            <div class="input-wrapper">
+              <i class="fas fa-hourglass-half"></i>
+              <input 
+                type="text" 
+                id="estimatedDuration" 
+                formControlName="estimatedDuration"
+                placeholder="e.g. 01:30"
+                [ngClass]="{'error': isInvalid('estimatedDuration')}"
+              >
+            </div>
+            <div *ngIf="isInvalid('estimatedDuration')" class="error-message">
+              Please enter a valid duration (HH:MM)
+            </div>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="genderPreference">Gender Preference</label>
+            <div class="input-wrapper">
+              <i class="fas fa-venus-mars"></i>
+              <select 
+                id="genderPreference" 
+                formControlName="genderPreference"
+              >
+                <option [value]="2">Any</option>
+                <option [value]="0">Female Only</option>
+                <option [value]="1">Male Only</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Options -->
+        <div class="form-group">
+          <div class="checkbox-wrapper">
+            <input 
+              type="checkbox" 
+              id="acceptsDeliveries" 
+              formControlName="acceptsDeliveries"
+            >
+            <label for="acceptsDeliveries">Accept Delivery Requests</label>
+          </div>
+        </div>
+
+        <!-- Max Delivery Weight (conditional) -->
+        <div class="form-group" *ngIf="tripForm.get('acceptsDeliveries')?.value">
+          <label for="maxDeliveryWeight">Maximum Delivery Weight (kg)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-weight"></i>
+            <input 
+              type="number" 
+              id="maxDeliveryWeight" 
+              formControlName="maxDeliveryWeight"
+              [ngClass]="{'error': isInvalid('maxDeliveryWeight')}"
+              min="0.1"
+              step="0.1"
+            >
+          </div>
+          <div *ngIf="isInvalid('maxDeliveryWeight')" class="error-message">
+            Please enter a valid weight
+          </div>
+        </div>
+
+        <!-- Trip Description -->
+        <div class="form-group">
+          <label for="tripDescription">Trip Description</label>
+          <textarea 
+            id="tripDescription" 
+            formControlName="tripDescription"
+            [ngClass]="{'error': isInvalid('tripDescription')}"
+            placeholder="Add details about your trip, rules, etc."
+            rows="4"
+          ></textarea>
+          <div *ngIf="isInvalid('tripDescription')" class="error-message">
+            Please provide a description (min 10 characters)
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label for="notes">Additional Notes (optional)</label>
+          <textarea 
+            id="notes" 
+            formControlName="notes"
+            placeholder="Any additional information for passengers"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <button type="submit" class="post-btn" [disabled]="tripForm.invalid || isSubmitting">
+          <i class="fas fa-plus-circle"></i>
+          <span *ngIf="!isSubmitting">Post Trip</span>
+          <span *ngIf="isSubmitting">Posting...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

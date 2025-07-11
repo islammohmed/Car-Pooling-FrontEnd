@@ -1,0 +1,240 @@
+<app-navbar></app-navbar>
+
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <div class="container">
+      <h1><i class="fas fa-users-cog me-2"></i>User Management</h1>
+      <p class="text-muted">Manage system users, control access, and monitor user activity</p>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <!-- Stats Cards -->
+    <div class="row stats-row mb-4" *ngIf="!loading">
+      <div class="col-md-3 mb-3">
+        <div class="stat-card total">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ users.length }}</h3>
+            <p>Total Users</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="stat-card passengers">
+          <div class="stat-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ getPassengersCount() }}</h3>
+            <p>Passengers</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="stat-card drivers">
+          <div class="stat-icon">
+            <i class="fas fa-car"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ getDriversCount() }}</h3>
+            <p>Drivers</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="stat-card blocked">
+          <div class="stat-icon">
+            <i class="fas fa-ban"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ getBlockedUsersCount() }}</h3>
+            <p>Blocked Users</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner">
+        <i class="fas fa-circle-notch fa-spin"></i>
+      </div>
+      <p>Loading users...</p>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card filter-card mb-4" *ngIf="!loading">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-5">
+            <div class="search-box">
+              <i class="fas fa-search search-icon"></i>
+              <input 
+                type="text" 
+                class="form-control search-input" 
+                placeholder="Search by name, email or phone..." 
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              >
+              <button *ngIf="searchTerm" class="btn-clear" (click)="searchTerm=''; onSearch()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="col-md-3">
+            <div class="select-container">
+              <i class="fas fa-user-tag select-icon"></i>
+              <select class="form-select custom-select" [(ngModel)]="roleFilter" (change)="onRoleFilterChange()">
+                <option value="all">All Roles</option>
+                <option value="passenger">Passengers</option>
+                <option value="driver">Drivers</option>
+                <option value="admin">Admins</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="col-md-3">
+            <div class="select-container">
+              <i class="fas fa-toggle-on select-icon"></i>
+              <select class="form-select custom-select" [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="col-md-1">
+            <button class="btn btn-refresh" title="Refresh users" (click)="refreshUsers()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card users-card" *ngIf="!loading">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-list me-2"></i>
+          Users List
+          <span class="badge bg-primary ms-2">{{ filteredUsers.length }}</span>
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover users-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Contact</th>
+                <th>Role</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers">
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <img *ngIf="user.profileImage && user.profileImage !== 'string'" [src]="user.profileImage" alt="Profile" class="avatar">
+                      <div *ngIf="!user.profileImage || user.profileImage === 'string'" class="avatar-placeholder">
+                        {{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}
+                      </div>
+                    </div>
+                    <div class="user-details">
+                      <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+                      <div class="user-id">ID: {{ user.id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="contact-info">
+                    <div><i class="fas fa-envelope me-2"></i>{{ user.email }}</div>
+                    <div *ngIf="user.phoneNumber"><i class="fas fa-phone me-2"></i>{{ user.phoneNumber }}</div>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge" [ngClass]="{
+                    'passenger': user.userRole === UserRole.Passenger,
+                    'driver': user.userRole === UserRole.Driver,
+                    'admin': user.userRole === UserRole.Admin
+                  }">
+                    <i class="fas" [ngClass]="{
+                      'fa-user': user.userRole === UserRole.Passenger,
+                      'fa-car': user.userRole === UserRole.Driver,
+                      'fa-user-shield': user.userRole === UserRole.Admin
+                    }"></i>
+                    {{ getUserRoleName(user.userRole) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="rating-stars">
+                    <i *ngFor="let star of [1,2,3,4,5]" 
+                       class="fas" 
+                       [ngClass]="star <= user.avgRating ? 'fa-star' : 'fa-star-o'"></i>
+                    <span class="rating-value">{{ user.avgRating | number:'1.1-1' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="user.isBlocked ? 'blocked' : 'active'">
+                    <i class="fas" [ngClass]="user.isBlocked ? 'fa-ban' : 'fa-check-circle'"></i>
+                    {{ user.isBlocked ? 'Blocked' : 'Active' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button 
+                      *ngIf="!user.isBlocked" 
+                      class="btn btn-action btn-block" 
+                      (click)="blockUser(user)"
+                      [disabled]="user.userRole === UserRole.Admin"
+                      title="Block User"
+                    >
+                      <i class="fas fa-ban"></i>
+                    </button>
+                    <button 
+                      *ngIf="user.isBlocked" 
+                      class="btn btn-action btn-unblock" 
+                      (click)="unblockUser(user)"
+                      title="Unblock User"
+                    >
+                      <i class="fas fa-check"></i>
+                    </button>
+                    <button 
+                      class="btn btn-action btn-delete" 
+                      (click)="deleteUser(user)"
+                      [disabled]="user.userRole === UserRole.Admin"
+                      title="Delete User"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredUsers.length === 0">
+                <td colspan="6" class="no-results">
+                  <div class="no-data-container">
+                    <i class="fas fa-search"></i>
+                    <h3>No users found</h3>
+                    <p>Try adjusting your search or filter criteria</p>
+                    <button class="btn btn-primary" (click)="resetFilters()">Reset Filters</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

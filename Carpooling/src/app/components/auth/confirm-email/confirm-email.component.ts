@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { NotificationService } from '../../../services/notification.service';
+import { CommonModule } from '@angular/common';
 
 interface ConfirmEmailResponse {
   success: boolean;
@@ -15,15 +15,16 @@ interface ConfirmEmailResponse {
 @Component({
   selector: 'app-confirm-email',
   templateUrl: './confirm-email.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, HttpClientModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   styleUrls: ['../login/login.component.css']
 })
 export class ConfirmEmailComponent implements OnInit {
   confirmForm: FormGroup;
   isSubmitting = false;
   isResending = false;
-  private apiUrl = 'https://localhost:7262/api/Auth/confirm-email';
-  private resendUrl = 'https://localhost:7262/api/Auth/resend-confirmation'; // Adjust if different
+  private apiUrl = 'http://localhost:5140/api/Auth/confirm-email';
+  private resendUrl = 'http://localhost:5140/api/Auth/resend-confirmation'; // Adjust if different
   
   // Get email and userId from route params or local storage
   private email: string = '';
@@ -63,13 +64,19 @@ export class ConfirmEmailComponent implements OnInit {
       this.isSubmitting = true;
       const confirmationCode = this.confirmForm.value.code;
 
-      const payload = {
-        email: this.email,
-        code: confirmationCode,
-        userId: this.userId
-      };
+      console.log('Sending confirmation request with params:',
+        { userId: this.userId, code: confirmationCode });
 
-      this.http.post<ConfirmEmailResponse>(this.apiUrl, payload).subscribe({
+      // Create URL with query parameters
+      const url = `${this.apiUrl}?userId=${encodeURIComponent(this.userId)}&code=${encodeURIComponent(confirmationCode)}`;
+
+      // Set headers
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+
+      // Use POST request with empty body but query parameters in URL
+      this.http.post<ConfirmEmailResponse>(url, {}, { headers }).subscribe({
         next: (response) => {
           this.isSubmitting = false;
           
@@ -128,12 +135,18 @@ export class ConfirmEmailComponent implements OnInit {
     
     this.isResending = true;
     
-    const payload = {
-      email: this.email,
-      userId: this.userId
-    };
+    console.log('Sending resend code request with params:', { userId: this.userId });
 
-    this.http.post<ConfirmEmailResponse>(this.resendUrl, payload).subscribe({
+    // Create URL with query parameters
+    const url = `${this.resendUrl}?userId=${encodeURIComponent(this.userId)}`;
+
+    // Set headers
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    // Use POST request with empty body but query parameters in URL
+    this.http.post<ConfirmEmailResponse>(url, {}, { headers }).subscribe({
       next: (response) => {
         this.isResending = false;
         

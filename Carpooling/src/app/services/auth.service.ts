@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -70,7 +70,8 @@ export interface DocumentVerificationsResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'https://localhost:7262/api';
+  private baseUrl = 'http://localhost:5140/api';
+  authChange = new EventEmitter<boolean>();
 
   constructor(private http: HttpClient) {}
 
@@ -120,6 +121,7 @@ export class AuthService {
   // Store token in localStorage
   storeToken(token: string): void {
     localStorage.setItem('authToken', token);
+    this.authChange.emit(true);
   }
 
   // Get stored token
@@ -148,5 +150,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
+    this.authChange.emit(false);
   }
 }

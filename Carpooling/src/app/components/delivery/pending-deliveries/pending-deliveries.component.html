@@ -1,0 +1,118 @@
+<app-navbar></app-navbar>
+<div class="pending-deliveries-container">
+  <div class="pending-deliveries-card">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-box"></i>
+        <span>CarPooling</span>
+      </div>
+      <h2>Pending Delivery Requests</h2>
+      <p>View and accept delivery requests that match your trips</p>
+    </div>
+
+    <!-- Trip Filter Information -->
+    <div *ngIf="filteringByTrip && tripDetails" class="trip-filter-info">
+      <div class="trip-details">
+        <h3>Filtering by Trip:</h3>
+        <div class="trip-route">
+          <i class="fas fa-map-marker-alt"></i>
+          <strong>{{ tripDetails.source }}</strong>
+          <i class="fas fa-arrow-right"></i>
+          <strong>{{ tripDetails.destination }}</strong>
+        </div>
+        <div class="trip-date">
+          <i class="fas fa-calendar-alt"></i>
+          <strong>Date:</strong> {{ tripDetails.departureTime | date:'mediumDate' }}
+        </div>
+        <button class="btn btn-sm btn-outline-secondary" (click)="clearTripFilter()">
+          <i class="fas fa-times"></i> Clear Filter
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="alert success">
+      <i class="fas fa-check-circle"></i> {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert error">
+      <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+
+    <div *ngIf="isLoading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading pending requests...</p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredRequests.length === 0" class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <p>No pending delivery requests found</p>
+      <span *ngIf="filteringByTrip">No delivery requests match this trip route and date</span>
+      <span *ngIf="!filteringByTrip">When users create delivery requests that match your trips, they'll appear here</span>
+    </div>
+
+    <div *ngIf="!isLoading && filteredRequests.length > 0" class="requests-list">
+      <div *ngFor="let request of filteredRequests" class="request-card">
+        <div class="request-header">
+          <h3>Delivery #{{ request.id }}</h3>
+          <span [ngClass]="'status-badge ' + request.status.toLowerCase()">{{ request.status }}</span>
+        </div>
+
+        <div class="request-details">
+          <div class="detail-row">
+            <div class="detail-label">From:</div>
+            <div class="detail-value">{{ request.sourceLocation }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">To:</div>
+            <div class="detail-value">{{ request.dropoffLocation }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Receiver:</div>
+            <div class="detail-value">{{ request.receiverPhone }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Weight:</div>
+            <div class="detail-value">{{ request.weight }} kg</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Price:</div>
+            <div class="detail-value">{{ request.price | currency }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Description:</div>
+            <div class="detail-value description">{{ request.itemDescription }}</div>
+          </div>
+          
+          <div class="detail-row" *ngIf="request.estimatedDeliveryTime">
+            <div class="detail-label">Estimated Delivery:</div>
+            <div class="detail-value">{{ request.estimatedDeliveryTime | date:'medium' }}</div>
+          </div>
+        </div>
+
+        <div class="trip-selection" *ngIf="!filteringByTrip">
+          <label for="trip-select-{{request.id}}">Select trip to deliver with:</label>
+          <select id="trip-select-{{request.id}}" class="trip-select" #tripSelect>
+            <option *ngIf="!request.matchingTrips || request.matchingTrips.length === 0" value="">No matching trips available</option>
+            <option *ngFor="let trip of request.matchingTrips || []" [value]="trip.tripId">
+              {{ trip.sourceLocation }} to {{ trip.destination }} - {{ trip.startTime | date:'short' }}
+            </option>
+          </select>
+        </div>
+
+        <div class="request-actions">
+          <button 
+            class="accept-btn" 
+            [disabled]="processingRequestId === request.id || (!filteringByTrip && (!request.matchingTrips || request.matchingTrips.length === 0))"
+            (click)="acceptDelivery(request.id, filteringByTrip ? tripId! : getSelectedTripId(request.id))">
+            <i class="fas fa-check"></i> Accept Delivery
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

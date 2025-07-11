@@ -1,0 +1,248 @@
+<app-navbar></app-navbar>
+<div class="my-requests-container">
+  <div class="my-requests-card">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-box"></i>
+        <span>CarPooling</span>
+      </div>
+      <h2>My Delivery Requests</h2>
+      <p>Track and manage your delivery requests</p>
+    </div>
+
+    <div class="actions-bar">
+      <button class="create-btn" (click)="createNewRequest()">
+        <i class="fas fa-plus"></i>
+        Create New Request
+      </button>
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Loading your delivery requests...</span>
+    </div>
+
+    <div class="no-requests" *ngIf="!isLoading && myRequests.length === 0">
+      <i class="fas fa-inbox"></i>
+      <p>No delivery requests available</p>
+      <p class="suggestion">Create a new delivery request to get started</p>
+    </div>
+
+    <div class="filter-bar" *ngIf="!isLoading && myRequests.length > 0">
+      <div class="filter-label">Filter by status:</div>
+      <div class="filter-options">
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'all'}" 
+          (click)="filterRequests('all')">
+          All
+        </button>
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'pending'}" 
+          (click)="filterRequests('pending')">
+          Pending
+        </button>
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'tripselected'}" 
+          (click)="filterRequests('tripselected')">
+          Trip Selected
+        </button>
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'accepted'}" 
+          (click)="filterRequests('accepted')">
+          Accepted
+        </button>
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'intransit'}" 
+          (click)="filterRequests('intransit')">
+          In Transit
+        </button>
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'delivered'}" 
+          (click)="filterRequests('delivered')">
+          Delivered
+        </button>
+        <button 
+          class="filter-btn" 
+          [ngClass]="{'active': selectedFilter === 'cancelled'}" 
+          (click)="filterRequests('cancelled')">
+          Cancelled
+        </button>
+      </div>
+    </div>
+
+    <div class="requests-list" *ngIf="!isLoading && filteredRequests.length > 0">
+      <div class="request-card" *ngFor="let request of filteredRequests">
+        <div class="request-header">
+          <div class="request-id">#{{ request.id }}</div>
+          <div class="status-badge" [ngClass]="getStatusClass(request.status)">{{ request.status }}</div>
+        </div>
+
+        <div class="request-route">
+          <div class="location source">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ request.sourceLocation }}</span>
+          </div>
+          <div class="route-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+          <div class="location destination">
+            <i class="fas fa-map-pin"></i>
+            <span>{{ request.dropoffLocation }}</span>
+          </div>
+        </div>
+
+        <div class="request-details">
+          <div class="detail-row">
+            <div class="detail">
+              <i class="fas fa-user"></i>
+              <span>{{ request.senderName }}</span>
+            </div>
+            <div class="detail">
+              <i class="fas fa-phone"></i>
+              <span>{{ request.receiverPhone }}</span>
+            </div>
+          </div>
+          <div class="detail-row">
+            <div class="detail">
+              <i class="fas fa-weight"></i>
+              <span>{{ request.weight }} kg</span>
+            </div>
+            <div class="detail">
+              <i class="fas fa-dollar-sign"></i>
+              <span>${{ request.price }}</span>
+            </div>
+          </div>
+          <div class="detail-row" *ngIf="request.driverName">
+            <div class="detail">
+              <i class="fas fa-car"></i>
+              <span>Driver: {{ request.driverName }}</span>
+            </div>
+          </div>
+          <div class="detail-row" *ngIf="request.estimatedDeliveryTime">
+            <div class="detail">
+              <i class="fas fa-clock"></i>
+              <span>Est. Delivery: {{ formatDate(request.estimatedDeliveryTime) }}</span>
+            </div>
+          </div>
+          <div class="detail-row" *ngIf="request.deliveryStartDate">
+            <div class="detail">
+              <i class="fas fa-play-circle"></i>
+              <span>Started: {{ formatDate(request.deliveryStartDate) }}</span>
+            </div>
+          </div>
+          <div class="detail-row" *ngIf="request.deliveryEndDate">
+            <div class="detail">
+              <i class="fas fa-flag-checkered"></i>
+              <span>Completed: {{ formatDate(request.deliveryEndDate) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-description">
+          <h4>Item Description:</h4>
+          <p>{{ request.itemDescription }}</p>
+        </div>
+
+        <div class="delivery-notes" *ngIf="request.notes">
+          <h4>Delivery Notes:</h4>
+          <p>{{ request.notes }}</p>
+        </div>
+
+        <div class="status-timeline">
+          <div class="timeline-item" [ngClass]="{'active': isStatusActive(request.status, DeliveryStatus.Pending)}">
+            <div class="timeline-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Pending</h4>
+            </div>
+          </div>
+          <div class="timeline-item" [ngClass]="{'active': isStatusActive(request.status, DeliveryStatus.TripSelected)}">
+            <div class="timeline-icon">
+              <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Trip Selected</h4>
+            </div>
+          </div>
+          <div class="timeline-item" [ngClass]="{'active': isStatusActive(request.status, DeliveryStatus.Accepted)}">
+            <div class="timeline-icon">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Accepted</h4>
+            </div>
+          </div>
+          <div class="timeline-item" [ngClass]="{'active': isStatusActive(request.status, DeliveryStatus.InTransit)}">
+            <div class="timeline-icon">
+              <i class="fas fa-truck"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>In Transit</h4>
+            </div>
+          </div>
+          <div class="timeline-item" [ngClass]="{'active': isStatusActive(request.status, DeliveryStatus.Delivered)}">
+            <div class="timeline-icon">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Delivered</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="request-actions">
+          <button 
+            class="view-btn" 
+            (click)="viewDetails(request.id)"
+          >
+            <i class="fas fa-eye"></i>
+            <span>View Details</span>
+          </button>
+          
+          <button 
+            *ngIf="request.status === DeliveryStatus.Pending"
+            class="matching-btn" 
+            (click)="viewMatchingTrips(request.id)"
+          >
+            <i class="fas fa-car-side"></i>
+            <span>View Matching Trips</span>
+          </button>
+          
+          <button 
+            *ngIf="canCancel(request.status)"
+            class="cancel-btn" 
+            [disabled]="processingRequestId === request.id"
+            (click)="cancelRequest(request.id)" 
+          >
+            <i class="fas fa-times"></i>
+            <span *ngIf="processingRequestId !== request.id">Cancel Request</span>
+            <span *ngIf="processingRequestId === request.id">Processing...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="no-filtered-requests" *ngIf="!isLoading && myRequests.length > 0 && filteredRequests.length === 0">
+      <i class="fas fa-filter"></i>
+      <p>No requests match the selected filter</p>
+      <p class="suggestion">Try selecting a different status filter</p>
+    </div>
+  </div>
+</div> 

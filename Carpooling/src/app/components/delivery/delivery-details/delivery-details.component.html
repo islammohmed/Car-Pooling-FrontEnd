@@ -1,0 +1,315 @@
+<app-navbar></app-navbar>
+
+<div class="delivery-details-page">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <p>Loading delivery details...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert-container">
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert-container">
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle me-2"></i>
+      {{ successMessage }}
+    </div>
+  </div>
+
+  <!-- Delivery Details Content -->
+  <div *ngIf="delivery && !isLoading" class="container">
+    <div class="delivery-header">
+      <div class="back-button">
+        <a (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+      </div>
+      <h1>Delivery Details</h1>
+      <div class="delivery-status" [ngClass]="getStatusClass(delivery.status)">
+        {{ delivery.status }}
+      </div>
+    </div>
+
+    <div class="delivery-actions" *ngIf="canCancel()">
+      <button class="cancel-btn" [disabled]="isCancelling" (click)="cancelDelivery()">
+        <i class="fas fa-times"></i>
+        <span *ngIf="!isCancelling">Cancel Delivery Request</span>
+        <span *ngIf="isCancelling">Cancelling...</span>
+      </button>
+    </div>
+
+    <div class="delivery-content">
+      <!-- Delivery Route Card -->
+      <div class="card delivery-route-card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-route"></i> Delivery Route
+          </h5>
+          <div class="route-container">
+            <div class="location-point start">
+              <div class="location-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="location-details">
+                <span class="location-label">Source Location</span>
+                <h3 class="location-name">{{ delivery.sourceLocation }}</h3>
+              </div>
+            </div>
+            
+            <div class="route-line">
+              <div class="route-dot"></div>
+              <div class="route-dash"></div>
+              <div class="route-dot"></div>
+            </div>
+            
+            <div class="location-point end">
+              <div class="location-icon">
+                <i class="fas fa-flag-checkered"></i>
+              </div>
+              <div class="location-details">
+                <span class="location-label">Dropoff Location</span>
+                <h3 class="location-name">{{ delivery.dropoffLocation }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="delivery-details-grid">
+        <!-- Package Info Card -->
+        <div class="card package-info-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-box"></i> Package Information
+            </h5>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-weight"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Weight</span>
+                  <span class="info-value">{{ delivery.weight }} kg</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Price</span>
+                  <span class="info-value">{{ delivery.price | currency }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item" *ngIf="delivery.deliveryStartDate">
+                <div class="info-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Start Date</span>
+                  <span class="info-value">{{ formatDate(delivery.deliveryStartDate) }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item" *ngIf="delivery.deliveryEndDate">
+                <div class="info-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">End Date</span>
+                  <span class="info-value">{{ formatDate(delivery.deliveryEndDate) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="package-description">
+              <h6>Item Description</h6>
+              <p>{{ delivery.itemDescription }}</p>
+            </div>
+
+            <div class="delivery-notes" *ngIf="delivery.notes">
+              <h6>Delivery Notes</h6>
+              <p>{{ delivery.notes }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Info Card -->
+        <div class="card contact-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-user"></i> Contact Information
+            </h5>
+            
+            <div class="contact-details">
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="contact-info">
+                  <span class="contact-label">Sender</span>
+                  <h4 class="contact-name">{{ delivery.senderName }}</h4>
+                </div>
+              </div>
+              
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                  <span class="contact-label">Receiver Phone</span>
+                  <h4 class="contact-name">{{ delivery.receiverPhone }}</h4>
+                </div>
+              </div>
+              
+              <div class="contact-item" *ngIf="delivery.driverName">
+                <div class="contact-icon">
+                  <i class="fas fa-car"></i>
+                </div>
+                <div class="contact-info">
+                  <span class="contact-label">Driver</span>
+                  <h4 class="contact-name">{{ delivery.driverName }}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Info Card (if applicable) -->
+        <div class="card trip-info-card" *ngIf="delivery.tripId">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-info-circle"></i> Trip Information
+            </h5>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-id-card"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Trip ID</span>
+                  <span class="info-value">#{{ delivery.tripId }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item" *ngIf="delivery.estimatedDeliveryTime">
+                <div class="info-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Estimated Delivery</span>
+                  <span class="info-value">{{ formatDate(delivery.estimatedDeliveryTime) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status History Card -->
+        <div class="card status-history-card" *ngIf="delivery.statusHistory && delivery.statusHistory.length > 0">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-history"></i> Status History
+            </h5>
+            
+            <div class="status-history">
+              <div class="status-item" *ngFor="let history of delivery.statusHistory">
+                <div class="status-badge" [ngClass]="getStatusClass(history.status)">
+                  {{ history.status }}
+                </div>
+                <div class="status-time">
+                  {{ formatDate(history.timestamp) }}
+                </div>
+                <div class="status-notes" *ngIf="history.notes">
+                  <i class="fas fa-comment-alt"></i>
+                  <span>{{ history.notes }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Timeline Card -->
+        <div class="card status-timeline-card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-tasks"></i> Delivery Status
+            </h5>
+            
+            <div class="status-timeline">
+              <div class="timeline-item" [ngClass]="{'active': isStatusActive(delivery.status, DeliveryStatus.Pending)}">
+                <div class="timeline-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="timeline-content">
+                  <h4>Pending</h4>
+                </div>
+              </div>
+              <div class="timeline-item" [ngClass]="{'active': isStatusActive(delivery.status, DeliveryStatus.TripSelected)}">
+                <div class="timeline-icon">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="timeline-content">
+                  <h4>Trip Selected</h4>
+                </div>
+              </div>
+              <div class="timeline-item" [ngClass]="{'active': isStatusActive(delivery.status, DeliveryStatus.Accepted)}">
+                <div class="timeline-icon">
+                  <i class="fas fa-check"></i>
+                </div>
+                <div class="timeline-content">
+                  <h4>Accepted</h4>
+                </div>
+              </div>
+              <div class="timeline-item" [ngClass]="{'active': isStatusActive(delivery.status, DeliveryStatus.InTransit)}">
+                <div class="timeline-icon">
+                  <i class="fas fa-truck"></i>
+                </div>
+                <div class="timeline-content">
+                  <h4>In Transit</h4>
+                </div>
+              </div>
+              <div class="timeline-item" [ngClass]="{'active': isStatusActive(delivery.status, DeliveryStatus.Delivered)}">
+                <div class="timeline-icon">
+                  <i class="fas fa-box-open"></i>
+                </div>
+                <div class="timeline-content">
+                  <h4>Delivered</h4>
+                </div>
+              </div>
+            </div>
+
+            <!-- Special statuses that aren't part of the normal flow -->
+            <div class="special-statuses" *ngIf="delivery.status === DeliveryStatus.Cancelled || 
+                                                 delivery.status === DeliveryStatus.Rejected || 
+                                                 delivery.status === DeliveryStatus.Expired">
+              <div class="special-status-badge" [ngClass]="getStatusClass(delivery.status)">
+                <i class="fas" 
+                   [ngClass]="{
+                     'fa-times-circle': delivery.status === DeliveryStatus.Cancelled || delivery.status === DeliveryStatus.Rejected,
+                     'fa-hourglass-end': delivery.status === DeliveryStatus.Expired
+                   }"></i>
+                {{ delivery.status }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

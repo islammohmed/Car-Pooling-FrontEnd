@@ -1,0 +1,232 @@
+<app-navbar></app-navbar>
+<div class="verification-container">
+  <!-- Navbar -->
+  <app-navbar></app-navbar>
+
+  <div class="content-wrapper">
+    <div class="verification-card">
+      <div class="verification-header">
+        <h2>Driver Document Verification</h2>
+        <p>Upload your documents to get verified as a driver</p>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading your document status...</p>
+      </div>
+
+      <!-- Document status section -->
+      <div *ngIf="!isLoading" class="document-status">
+        <h3>Document Status</h3>
+        
+        <div class="status-grid">
+          <!-- National ID -->
+          <div class="document-item">
+            <div class="document-icon">
+              <i class="fas fa-id-card"></i>
+            </div>
+            <div class="document-info">
+              <h4>National ID</h4>
+              <span [class]="getStatusClass(nationalIdStatus)" class="status-badge">
+                {{ getStatusText(nationalIdStatus) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Driving License -->
+          <div class="document-item">
+            <div class="document-icon">
+              <i class="fas fa-id-badge"></i>
+            </div>
+            <div class="document-info">
+              <h4>Driving License</h4>
+              <span [class]="getStatusClass(drivingLicenseStatus)" class="status-badge">
+                {{ getStatusText(drivingLicenseStatus) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Car License -->
+          <div class="document-item">
+            <div class="document-icon">
+              <i class="fas fa-car"></i>
+            </div>
+            <div class="document-info">
+              <h4>Car License</h4>
+              <span [class]="getStatusClass(carLicenseStatus)" class="status-badge">
+                {{ getStatusText(carLicenseStatus) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All documents verified message -->
+      <div *ngIf="!isLoading && nationalIdStatus === 'Approved' && drivingLicenseStatus === 'Approved' && carLicenseStatus === 'Approved'" class="success-message">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="success-content">
+          <h3>All Documents Verified!</h3>
+          <p>You can now post trips as a driver.</p>
+          <button class="btn-primary" (click)="navigateToPostTrip()">Post a Trip</button>
+        </div>
+      </div>
+
+      <!-- Document upload section -->
+      <div *ngIf="!isLoading && (nationalIdStatus !== 'Approved' || drivingLicenseStatus !== 'Approved' || carLicenseStatus !== 'Approved')" class="document-upload">
+        <h3>Upload Documents</h3>
+        <p class="upload-note">Please upload any missing or rejected documents</p>
+
+        <!-- Individual document uploads -->
+        <div class="upload-grid">
+          <!-- National ID Upload -->
+          <div *ngIf="nationalIdStatus !== 'Approved'" class="upload-item">
+            <h4>National ID</h4>
+            <div class="file-upload">
+              <input 
+                type="file" 
+                id="nationalId" 
+                accept="image/*,.pdf" 
+                (change)="onFileSelected($event, 'NationalId')" 
+                class="file-input"
+              >
+              <label for="nationalId" class="file-label">
+                <i class="fas fa-upload"></i>
+                <span>Choose File</span>
+              </label>
+              <span class="file-name">{{ nationalIdFile?.name || 'No file chosen' }}</span>
+            </div>
+            <button 
+              class="btn-upload" 
+              [disabled]="!nationalIdFile || isSubmitting" 
+              (click)="uploadSingleDocument('NationalId', nationalIdFile!)">
+              <i class="fas fa-upload"></i>
+              <span>Upload</span>
+            </button>
+          </div>
+
+          <!-- Driving License Upload -->
+          <div *ngIf="drivingLicenseStatus !== 'Approved'" class="upload-item">
+            <h4>Driving License</h4>
+            <div class="file-upload">
+              <input 
+                type="file" 
+                id="drivingLicense" 
+                accept="image/*,.pdf" 
+                (change)="onFileSelected($event, 'DrivingLicense')" 
+                class="file-input"
+              >
+              <label for="drivingLicense" class="file-label">
+                <i class="fas fa-upload"></i>
+                <span>Choose File</span>
+              </label>
+              <span class="file-name">{{ drivingLicenseFile?.name || 'No file chosen' }}</span>
+            </div>
+            <button 
+              class="btn-upload" 
+              [disabled]="!drivingLicenseFile || isSubmitting" 
+              (click)="uploadSingleDocument('DrivingLicense', drivingLicenseFile!)">
+              <i class="fas fa-upload"></i>
+              <span>Upload</span>
+            </button>
+          </div>
+
+          <!-- Car License Upload -->
+          <div *ngIf="carLicenseStatus !== 'Approved'" class="upload-item">
+            <h4>Car License</h4>
+            <div class="file-upload">
+              <input 
+                type="file" 
+                id="carLicense" 
+                accept="image/*,.pdf" 
+                (change)="onFileSelected($event, 'CarLicense')" 
+                class="file-input"
+              >
+              <label for="carLicense" class="file-label">
+                <i class="fas fa-upload"></i>
+                <span>Choose File</span>
+              </label>
+              <span class="file-name">{{ carLicenseFile?.name || 'No file chosen' }}</span>
+            </div>
+            <button 
+              class="btn-upload" 
+              [disabled]="!carLicenseFile || isSubmitting" 
+              (click)="uploadSingleDocument('CarLicense', carLicenseFile!)">
+              <i class="fas fa-upload"></i>
+              <span>Upload</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Car details form (only shown if not already registered as driver) -->
+        <div *ngIf="!hasCarLicense" class="car-details-form">
+          <h3>Car Details</h3>
+          <p>Please provide details about your car</p>
+
+          <form [formGroup]="documentForm" (ngSubmit)="registerAsDriver()" class="car-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="model">Car Model</label>
+                <input 
+                  type="text" 
+                  id="model" 
+                  formControlName="model" 
+                  placeholder="e.g. Toyota Corolla"
+                  [ngClass]="{'error': documentForm.get('model')?.invalid && documentForm.get('model')?.touched}"
+                >
+                <div *ngIf="documentForm.get('model')?.invalid && documentForm.get('model')?.touched" class="error-message">
+                  Car model is required
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="color">Car Color</label>
+                <input 
+                  type="text" 
+                  id="color" 
+                  formControlName="color" 
+                  placeholder="e.g. Silver"
+                  [ngClass]="{'error': documentForm.get('color')?.invalid && documentForm.get('color')?.touched}"
+                >
+                <div *ngIf="documentForm.get('color')?.invalid && documentForm.get('color')?.touched" class="error-message">
+                  Car color is required
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="plateNumber">License Plate</label>
+                <input 
+                  type="text" 
+                  id="plateNumber" 
+                  formControlName="plateNumber" 
+                  placeholder="e.g. ABC 123"
+                  [ngClass]="{'error': documentForm.get('plateNumber')?.invalid && documentForm.get('plateNumber')?.touched}"
+                >
+                <div *ngIf="documentForm.get('plateNumber')?.invalid && documentForm.get('plateNumber')?.touched" class="error-message">
+                  License plate is required
+                </div>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn-register" 
+              [disabled]="documentForm.invalid || !nationalIdFile || !drivingLicenseFile || !carLicenseFile || isSubmitting">
+              <i class="fas fa-car"></i>
+              <span *ngIf="!isSubmitting">Register as Driver</span>
+              <span *ngIf="isSubmitting">
+                <i class="fas fa-spinner fa-spin"></i>
+                Submitting...
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div> 

@@ -1,0 +1,159 @@
+<app-navbar></app-navbar>
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header">
+      <h3>
+        <i class="fas fa-file-upload me-2"></i>
+        Update Driver Documents
+      </h3>
+    </div>
+    <div class="card-body">
+      <!-- Enhanced Alert Messages -->
+      <div *ngIf="message" class="alert" [ngClass]="{'alert-success': isSuccess, 'alert-danger': isError}" role="alert">
+        <i class="fas" [ngClass]="{'fa-check-circle': isSuccess, 'fa-exclamation-triangle': isError}" aria-hidden="true"></i>
+        {{ message }}
+      </div>
+
+      <!-- Current Documents Status with Enhanced Design -->
+      <div class="mb-4">
+        <h5>
+          <i class="fas fa-clipboard-list me-2"></i>
+          Current Documents Status
+        </h5>
+        
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center loading-container">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Loading your documents...</p>
+        </div>
+        
+        <!-- No Documents State -->
+        <div *ngIf="!isLoading && documents.length === 0" class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-file-plus"></i>
+          </div>
+          <h6 class="empty-state-title">No Documents Found</h6>
+          <p class="empty-state-text">Start by uploading your first document below.</p>
+        </div>
+        
+        <!-- Documents Table -->
+        <div *ngIf="!isLoading && documents.length > 0" class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>
+                  <i class="fas fa-file-alt me-2"></i>
+                  Document Type
+                </th>
+                <th>
+                  <i class="fas fa-calendar me-2"></i>
+                  Submission Date
+                </th>
+                <th>
+                  <i class="fas fa-info-circle me-2"></i>
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let doc of documents" class="document-row">
+                <td class="document-type">
+                  <i class="fas fa-id-card me-2 text-primary"></i>
+                  {{ doc.documentType }}
+                </td>
+                <td class="submission-date">
+                  {{ doc.submissionDate | date:'medium' }}
+                </td>
+                <td>
+                  <span [ngClass]="getStatusClass(doc.status)" class="status-badge">
+                    <i class="fas" [ngClass]="{
+                      'fa-clock': doc.status === verificationStatus.Pending,
+                      'fa-check': doc.status === verificationStatus.Approved,
+                      'fa-times': doc.status === verificationStatus.Rejected
+                    }" aria-hidden="true"></i>
+                    {{ getStatusText(doc.status) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Enhanced Update Document Form -->
+      <div class="mb-4">
+        <h5>
+          <i class="fas fa-upload me-2"></i>
+          Update Document
+        </h5>
+        
+        <form [formGroup]="documentForm" (ngSubmit)="onSubmit()" class="enhanced-form">
+          <!-- Document Type Field -->
+          <div class="mb-3 form-group">
+            <label for="documentType" class="form-label">
+              <i class="fas fa-list me-2"></i>
+              Document Type
+            </label>
+            <select id="documentType" formControlName="documentType" class="form-select">
+              <option value="">Select Document Type</option>
+              <option *ngFor="let type of documentTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+            <div *ngIf="documentForm.get('documentType')?.invalid && documentForm.get('documentType')?.touched" 
+                 class="text-danger validation-error">
+              <i class="fas fa-exclamation-circle me-1"></i>
+              Document type is required
+            </div>
+          </div>
+          
+          <!-- File Upload Field -->
+          <div class="mb-3 form-group">
+            <label for="documentFile" class="form-label">
+              <i class="fas fa-file me-2"></i>
+              Document File
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file" id="documentFile" class="form-control file-input" 
+                     (change)="onFileChange($event)" accept="image/*,.pdf">
+              <div class="file-upload-overlay">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Choose file or drag & drop</span>
+              </div>
+            </div>
+            <div *ngIf="selectedFile" class="selected-file-info">
+              <i class="fas fa-file-check text-success me-2"></i>
+              <span>{{ selectedFile.name }}</span>
+            </div>
+            <div *ngIf="documentForm.get('documentFile')?.invalid && documentForm.get('documentFile')?.touched" 
+                 class="text-danger validation-error">
+              <i class="fas fa-exclamation-circle me-1"></i>
+              Document file is required
+            </div>
+            <small class="form-text">
+              <i class="fas fa-info-circle me-1"></i>
+              Accepted formats: Images (JPG, PNG, GIF), PDF | Max size: 10MB
+            </small>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button type="submit" class="btn btn-primary btn-lg" 
+                    [disabled]="documentForm.invalid || isSubmitting">
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" 
+                    role="status" aria-hidden="true"></span>
+              <i *ngIf="!isSubmitting" class="fas fa-upload me-2"></i>
+              {{ isSubmitting ? 'Updating...' : 'Update Document' }}
+            </button>
+            <button routerLink='/home' class="btn btn-secondary btn-lg">
+              <i class="fas fa-home me-2"></i>
+              Back to Home
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

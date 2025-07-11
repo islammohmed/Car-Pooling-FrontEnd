@@ -1,0 +1,125 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <a class="navbar-logo" routerLink="/">
+      <i class="fas fa-car"></i>
+      <span>RideConnect</span>
+    </a>
+    
+    <div class="navbar-links" [class.active]="isMenuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      
+      <ng-container *ngIf="isLoggedIn && userData?.userRole === 1">
+        <a routerLink="/driver-registration/update-documents" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-id-card"></i>
+          <span>Update Documents</span>
+        </a>
+        <a routerLink="/delivery/driver/selected-deliveries" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-clipboard-list"></i>
+          <span>Selected Deliveries</span>
+          <span *ngIf="selectedDeliveryCount > 0" class="notification-badge">{{ selectedDeliveryCount }}</span>
+        </a>
+
+        <a routerLink="/delivery/driver/my-deliveries" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-truck"></i>
+          <span>My Deliveries</span>
+        </a>
+      </ng-container>
+      
+      <ng-container *ngIf="isLoggedIn && userData?.userRole === 2">
+        <a routerLink="/admin/documents" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-clipboard-check"></i>
+          <span>Verifications</span>
+        </a>
+        <a routerLink="/admin/users" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-users-cog"></i>
+          <span>User Management</span>
+        </a>
+      </ng-container>
+      
+      <ng-container *ngIf="isLoggedIn">
+        <a routerLink="/trip/my-trips" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-route"></i>
+          <span>My Trips</span>
+        </a>
+        <a routerLink="/profile" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-user"></i>
+          <span>Profile</span>
+        </a>
+      </ng-container>
+      
+      <ng-container *ngIf="!isLoggedIn">
+        <a routerLink="/login" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Login</span>
+        </a>
+        <a routerLink="/register" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-user-plus"></i>
+          <span>Register</span>
+        </a>
+      </ng-container>
+    </div>
+    
+    <div class="menu-toggle" (click)="toggleMenu()">
+      <i class="fas" [ngClass]="isMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+    </div>
+    
+    <div class="user-menu" *ngIf="isLoggedIn">
+      <div class="user-avatar" (click)="toggleUserDropdown()">
+        {{ getUserInitials() }}
+      </div>
+      <div class="user-dropdown" [class.active]="isUserDropdownOpen">
+        <div class="user-info">
+          <span class="user-name">{{ userData?.firstName }} {{ userData?.lastName }}</span>
+          <span class="user-role">{{ getUserRoleText() }}</span>
+        </div>
+        <a routerLink="/profile" class="dropdown-item">
+          <i class="fas fa-user-circle"></i>
+          <span>My Profile</span>
+        </a>
+        <a routerLink="/trip/my-trips" class="dropdown-item">
+          <i class="fas fa-route"></i>
+          <span>My Trips</span>
+        </a>
+        
+        <ng-container *ngIf="userData?.userRole === 2">
+          <a routerLink="/admin/documents" class="dropdown-item">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Verifications</span>
+          </a>
+          <a routerLink="/admin/users" class="dropdown-item">
+            <i class="fas fa-users-cog"></i>
+            <span>User Management</span>
+          </a>
+        </ng-container>
+        
+        <ng-container *ngIf="userData?.userRole === 1">
+          <a routerLink="/driver-registration/update-documents" class="dropdown-item">
+            <i class="fas fa-id-card"></i>
+            <span>Update Documents</span>
+          </a>
+          <a routerLink="/delivery/driver/selected-deliveries" class="dropdown-item">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Selected Deliveries</span>
+            <span *ngIf="selectedDeliveryCount > 0" class="notification-badge">{{ selectedDeliveryCount }}</span>
+          </a>
+          <a routerLink="/delivery/driver/my-deliveries" class="dropdown-item">
+            <i class="fas fa-truck"></i>
+            <span>My Deliveries</span>
+          </a>
+          <a routerLink="/delivery/driver/my-requests" class="dropdown-item">
+            <i class="fas fa-shipping-fast"></i>
+            <span>My Delivery Requests</span>
+          </a>
+        </ng-container>
+        <div class="dropdown-divider"></div>
+        <a (click)="logout()" class="dropdown-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,72 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h1 class="admin-title">Admin Dashboard</h1>
+    <div>
+      <!-- Add logout button or other admin actions here -->
+    </div>
+  </header>
+
+  <div class="admin-content">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Document Verification</h2>
+          <p class="card-subtitle">Review and approve user documents</p>
+        </div>
+        <button class="btn btn-primary" (click)="loadPendingDocuments()">
+          Refresh
+        </button>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="loading" class="empty-state">
+        <p>Loading pending documents...</p>
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="error && !loading" class="empty-state">
+        <i class="fa fa-exclamation-circle"></i>
+        <h3>Error</h3>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary" (click)="loadPendingDocuments()">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && !error && userIds.length === 0" class="empty-state">
+        <i class="fa fa-check-circle"></i>
+        <h3>No Pending Documents</h3>
+        <p>There are no documents waiting for verification at this time.</p>
+      </div>
+
+      <!-- Documents list grouped by user -->
+      <div *ngIf="!loading && !error && userIds.length > 0" class="documents-list">
+        <div *ngFor="let userId of userIds" class="document-card">
+          <div class="document-header">
+            <h3 class="document-type">{{ getUserName(userId) }}</h3>
+            <span class="document-status status-pending">
+              {{ getDocumentCount(userId) }} Documents
+            </span>
+          </div>
+          <div class="document-info">
+            <p><span class="label">User ID:</span> {{ userId }}</p>
+            <p><span class="label">Documents:</span> 
+              <span *ngFor="let doc of groupedDocuments[userId]; let last = last">
+                {{ doc.documentType }}{{ !last ? ', ' : '' }}
+              </span>
+            </p>
+            <p><span class="label">Submission Date:</span> 
+              {{ groupedDocuments[userId][0].submissionDate | date:'medium' }}
+            </p>
+          </div>
+          <div class="document-actions">
+            <button class="btn btn-primary" (click)="viewUserDocuments(userId)">
+              Review Documents
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

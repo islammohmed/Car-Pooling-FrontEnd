@@ -1,0 +1,429 @@
+.my-deliveries-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.my-deliveries-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+  padding: 32px;
+  width: 100%;
+  max-width: 800px;
+  animation: slideUp 0.6s ease-out;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logo i {
+  font-size: 32px;
+  color: #667eea;
+}
+
+.logo span {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.header h2 {
+  color: #2d3748;
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.header p {
+  color: #718096;
+  margin: 0;
+  font-size: 16px;
+}
+
+.success-message {
+  background-color: #c6f6d5;
+  color: #22543d;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message {
+  background-color: #fed7d7;
+  color: #822727;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #667eea;
+  gap: 16px;
+}
+
+.loading-spinner i {
+  font-size: 32px;
+}
+
+.no-deliveries {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #a0aec0;
+  text-align: center;
+}
+
+.no-deliveries i {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.no-deliveries p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.no-deliveries .suggestion {
+  font-size: 14px;
+  margin-top: 8px;
+  color: #718096;
+}
+
+.view-pending-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.view-pending-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.delivery-card {
+  background: #f7fafc;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.delivery-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.delivery-id {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.accepted {
+  background-color: #bbf7d0;
+  color: #166534;
+}
+
+.status-badge.intransit {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.status-badge.delivered {
+  background-color: #c7d2fe;
+  color: #3730a3;
+}
+
+.delivery-route {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.location i {
+  color: #667eea;
+}
+
+.location.source i {
+  color: #38a169;
+}
+
+.location.destination i {
+  color: #e53e3e;
+}
+
+.route-arrow {
+  margin: 0 16px;
+  color: #a0aec0;
+}
+
+.delivery-details {
+  margin-bottom: 16px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.detail i {
+  color: #667eea;
+  width: 16px;
+  text-align: center;
+}
+
+.item-description {
+  margin-bottom: 16px;
+}
+
+.item-description h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.item-description p {
+  margin: 0;
+  color: #2d3748;
+  font-size: 14px;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.delivery-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.details-btn, .update-status-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+}
+
+.details-btn {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.details-btn:hover {
+  background-color: #cbd5e0;
+}
+
+.update-status-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.update-status-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.update-status-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .my-deliveries-container {
+    padding: 16px;
+  }
+  
+  .my-deliveries-card {
+    padding: 24px;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .delivery-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Add styles for status history and notes */
+.delivery-notes, .status-history {
+  margin: 15px 0;
+  padding: 0 15px;
+}
+
+.delivery-notes h4, .status-history h4 {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.delivery-notes p {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.status-history {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.status-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  padding: 5px 0;
+}
+
+.status-badge.small {
+  font-size: 10px;
+  padding: 3px 6px;
+  margin-right: 10px;
+}
+
+.status-time {
+  font-size: 12px;
+  color: #777;
+  margin-right: 10px;
+}
+
+.status-notes {
+  font-size: 12px;
+  color: #555;
+  font-style: italic;
+  flex-grow: 1;
+}
+
+.status-update-form {
+  margin: 15px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+
+.status-update-form label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.status-update-form textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.status-update-form textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+} 

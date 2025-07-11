@@ -1,0 +1,156 @@
+<app-navbar></app-navbar>
+<div class="my-deliveries-container">
+  <div class="my-deliveries-card">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-truck"></i>
+        <span>CarPooling</span>
+      </div>
+      <h2>My Deliveries</h2>
+      <p>Manage deliveries you've accepted</p>
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Loading your deliveries...</span>
+    </div>
+
+    <div class="no-deliveries" *ngIf="!isLoading && myDeliveries.length === 0">
+      <i class="fas fa-box-open"></i>
+      <p>You don't have any accepted deliveries yet</p>
+      <p class="suggestion">Check pending delivery requests to accept new deliveries</p>
+      <button class="view-pending-btn" routerLink="/delivery/driver/pending-deliveries">
+        <i class="fas fa-list"></i>
+        View Pending Requests
+      </button>
+    </div>
+
+    <div class="deliveries-list" *ngIf="!isLoading && myDeliveries.length > 0">
+      <div class="delivery-card" *ngFor="let delivery of myDeliveries">
+        <div class="delivery-header">
+          <div class="delivery-id">#{{ delivery.id }}</div>
+          <div class="status-badge" [ngClass]="getStatusClass(delivery.status)">{{ delivery.status }}</div>
+        </div>
+
+        <div class="delivery-route">
+          <div class="location source">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ delivery.sourceLocation }}</span>
+          </div>
+          <div class="route-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+          <div class="location destination">
+            <i class="fas fa-map-pin"></i>
+            <span>{{ delivery.dropoffLocation }}</span>
+          </div>
+        </div>
+
+        <div class="delivery-details">
+          <div class="detail-row">
+            <div class="detail">
+              <i class="fas fa-user"></i>
+              <span>Sender: {{ delivery.senderName }}</span>
+            </div>
+            <div class="detail">
+              <i class="fas fa-phone"></i>
+              <span>Receiver: {{ delivery.receiverPhone }}</span>
+            </div>
+          </div>
+          <div class="detail-row">
+            <div class="detail">
+              <i class="fas fa-weight"></i>
+              <span>{{ delivery.weight }} kg</span>
+            </div>
+            <div class="detail">
+              <i class="fas fa-dollar-sign"></i>
+              <span>${{ delivery.price }}</span>
+            </div>
+          </div>
+          <div class="detail-row" *ngIf="delivery.estimatedDeliveryTime">
+            <div class="detail">
+              <i class="fas fa-clock"></i>
+              <span>Est. Delivery: {{ formatDate(delivery.estimatedDeliveryTime) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-description">
+          <h4>Item Description:</h4>
+          <p>{{ delivery.itemDescription }}</p>
+        </div>
+
+        <div class="delivery-notes" *ngIf="delivery.notes">
+          <h4>Delivery Notes:</h4>
+          <p>{{ delivery.notes }}</p>
+        </div>
+
+        <div class="status-history" *ngIf="delivery.statusHistory && delivery.statusHistory.length > 0">
+          <h4>Status History:</h4>
+          <div class="status-item" *ngFor="let history of delivery.statusHistory">
+            <div class="status-badge small" [ngClass]="getStatusClass(history.status)">{{ history.status }}</div>
+            <div class="status-time">{{ formatDate(history.timestamp) }}</div>
+            <div class="status-notes" *ngIf="history.notes">{{ history.notes }}</div>
+          </div>
+        </div>
+
+        <div class="detail-row" *ngIf="delivery.deliveryStartDate">
+          <div class="detail-label">Start Date:</div>
+          <div class="detail-value">{{ formatDate(delivery.deliveryStartDate) }}</div>
+        </div>
+
+        <div class="detail-row" *ngIf="delivery.deliveryEndDate">
+          <div class="detail-label">End Date:</div>
+          <div class="detail-value">{{ formatDate(delivery.deliveryEndDate) }}</div>
+        </div>
+
+        <div class="detail-row" *ngIf="delivery.estimatedDeliveryTime">
+          <div class="detail-label">Estimated Delivery:</div>
+          <div class="detail-value">{{ formatDate(delivery.estimatedDeliveryTime) }}</div>
+        </div>
+
+        <div class="status-update-form" *ngIf="canUpdateStatus(delivery.status)">
+          <label for="status-notes-{{delivery.id}}">Status Update Notes (optional):</label>
+          <textarea 
+            id="status-notes-{{delivery.id}}" 
+            [(ngModel)]="statusNotes" 
+            placeholder="Add any notes about this status update"
+          ></textarea>
+        </div>
+
+        <div class="delivery-actions">
+          <button 
+            class="details-btn" 
+            (click)="viewDeliveryDetails(delivery.id)"
+          >
+            <i class="fas fa-info-circle"></i>
+            Details
+          </button>
+          
+          <button 
+            class="update-status-btn" 
+            *ngIf="canUpdateStatus(delivery.status)"
+            [disabled]="processingRequestId === delivery.id"
+            (click)="updateStatus(delivery.id, getNextStatus(delivery.status)!)"
+          >
+            <i class="fas fa-arrow-right"></i>
+            <span *ngIf="processingRequestId !== delivery.id">
+              Mark as {{ getNextStatusText(delivery.status) }}
+            </span>
+            <span *ngIf="processingRequestId === delivery.id">Processing...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

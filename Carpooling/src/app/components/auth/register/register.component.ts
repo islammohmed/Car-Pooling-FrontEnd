@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router, RouterModule } from '@angular/router';
 import { NotificationService } from '../../../services/notification.service';
+import { CommonModule } from '@angular/common';
 
 interface RegisterRequest {
   email: string;
@@ -37,9 +37,9 @@ interface RegisterResponse {
 
 @Component({
   selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './register.component.html',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
@@ -48,7 +48,7 @@ export class RegisterComponent implements OnInit {
   showConfirmPassword = false;
   isLoading = false;
 
-  private apiUrl = 'https://localhost:7262/api/Auth/register';
+  private apiUrl = 'http://localhost:5140/api/Auth/register';
 
   constructor(
     private fb: FormBuilder,
