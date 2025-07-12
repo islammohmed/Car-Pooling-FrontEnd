@@ -24,6 +24,7 @@ import { DriverRegistrationComponent } from './components/driver-registration/dr
 import { UpdateDocumentsComponent } from './components/driver-registration/update-documents/update-documents.component';
 import { BecomeDriverComponent } from './components/user/become-driver/become-driver.component';
 import { ProfileComponent } from './profile/profile.component';
+import { TrackRouteComponent } from './components/track-route/track-route.component';
 
 // Services
 import { AuthService } from './services/auth.service';
@@ -61,6 +62,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
     UpdateDocumentsComponent,
     BecomeDriverComponent,
     ProfileComponent,
+    TrackRouteComponent,
     
     // Feature modules
     SharedModule,

@@ -93,8 +93,8 @@ export class TripDetailsComponent implements OnInit {
         this.loadTripParticipants();
         
         // Load driver details from API
-        if (this.trip.driverId) {
-          this.loadDriverDetails(this.trip.driverId);
+        if (this.trip!.driverId) {
+          this.loadDriverDetails(this.trip!.driverId);
         }
         
         // Check if trip date is in the past

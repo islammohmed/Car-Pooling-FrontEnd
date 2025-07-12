@@ -6,11 +6,15 @@ import 'leaflet/dist/leaflet.css';
 import { RouteService } from '../../services/route.service';
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { TripService } from '../../services/trip.service';
 
 @Component({
   selector: 'app-map',
   templateUrl: './track-route.component.html',
   styleUrls: ['./track-route.component.css'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class TrackRouteComponent implements OnInit, OnDestroy {
   private map!: L.Map;
@@ -23,11 +27,14 @@ export class TrackRouteComponent implements OnInit, OnDestroy {
 
   private destinationMarker?: L.Marker;
   private routeLine: L.Polyline[] = [];
+  
+  hasRouteInstructions: boolean = false;
 
   constructor(private routeService: RouteService,
+    private tripService: TripService,
     private route: ActivatedRoute) {
-    this.tripId = +this.route.snapshot.paramMap.get('tripId')!;
-    debugger;
+    this.tripId = +this.route.snapshot.paramMap.get('id')!;
+    console.log('Trip ID from route:', this.tripId);
   }
 
   ngOnInit(): void {
@@ -53,15 +60,13 @@ export class TrackRouteComponent implements OnInit, OnDestroy {
 
         L.marker([this.userLat(), this.userLng()]).addTo(this.map);
       });
-      let autocomplete = new GeocoderAutocomplete(
-        document.getElementById('autocomplete')!,
-        'b17305e1db124fbe9ec3da0776b98f3a'
-      );
-      autocomplete.on('select', (location) => {
-        this.destinationLat.set(location.properties.lat);
-        this.destinationLng.set(location.properties.lon);
+      this.tripService.getTripById(this.tripId).subscribe(response => {
+        console.log(response);
+        
+        this.destinationLat.set(response.destinationLatitute);
+        this.destinationLng.set(response.destinationLongitude);
         this.DepictRoute();
-      });
+      })
     } else {
       alert('Geolocation is not supported by this browser.');
     }
@@ -78,6 +83,15 @@ export class TrackRouteComponent implements OnInit, OnDestroy {
         }
       }
     }
+    
+    // Clear previous route instructions
+    const routeElement = document.getElementById('route');
+    if (routeElement) {
+      routeElement.innerHTML = '';
+    }
+    
+    this.hasRouteInstructions = false;
+    
     // Add a new marker at the selected location (red by default, or use a custom icon)
     const redIcon = new L.Icon({
       iconUrl: 'red-placeholder.png', // Replace with your red marker icon URL
@@ -91,6 +105,8 @@ export class TrackRouteComponent implements OnInit, OnDestroy {
 
     // Draw a blue line between the user and the destination
     this.routeService.getRoute(this.userLat(), this.userLng(), this.destinationLat(), this.destinationLng()).subscribe( response=> {
+      this.hasRouteInstructions = true;
+      
       for(let i = 0; i < response.directions.length; i++) {
         const step = response.directions[i];
         const stepLine = L.polyline(

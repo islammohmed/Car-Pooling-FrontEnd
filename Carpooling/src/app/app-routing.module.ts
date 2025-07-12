@@ -7,6 +7,7 @@ import { ConfirmEmailComponent } from './components/auth/confirm-email/confirm-e
 import { AuthGuard } from './services/auth.guard';
 import { DriverVerificationGuard } from './services/driver-verification.guard';
 import { ProfileComponent } from './profile/profile.component';
+import { TrackRouteComponent } from './components/track-route/track-route.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -53,6 +54,10 @@ const routes: Routes = [
     loadChildren: () => import('./components/driver-registration/driver-registration.module').then(m => m.DriverRegistrationModule),
     canActivate: [AuthGuard, DriverVerificationGuard],
     data: { roles: [1] }
+  },
+  { 
+    path: 'track/:id', 
+    component: TrackRouteComponent
   },
   { path: '**', redirectTo: '' }
 ];

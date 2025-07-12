@@ -55,10 +55,6 @@ export const routes: Routes = [
     loadChildren: () => import('./components/trip/trip.module').then(m => m.TripModule),
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'track/:tripId', 
-    component: TrackRouteComponent
-  },
   {
     path: 'admin',
     loadChildren: () => import('./components/admin/admin.module').then(m => m.AdminModule),
@@ -87,6 +83,10 @@ export const routes: Routes = [
   },
   { path: 'test-routing', component: TestRoutingComponent },
   { path: 'driver-registration', component: DriverRegistrationComponent },
+  { 
+    path: 'track/:id', 
+    component: TrackRouteComponent
+  },
   { path: '**', redirectTo: '' }
 ];
 

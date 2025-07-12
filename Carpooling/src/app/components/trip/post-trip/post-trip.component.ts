@@ -77,7 +77,7 @@ export class PostTripComponent implements OnInit, AfterViewChecked {
       sourceCity: ['', [Validators.required]],
 
       
-      destinationLocation: ['', [Validators.required]],
+      destination: ['', [Validators.required]],
       destinationLatitude: [0, [Validators.required]],
       destinationLongitude: [0, [Validators.required]],
       destinationCity: ['', [Validators.required]],
@@ -171,7 +171,7 @@ export class PostTripComponent implements OnInit, AfterViewChecked {
           );
           autocomplete.on('select', (location) => {
             this.tripForm
-              .get('destinationLocation')
+              .get('destination')
               ?.setValue(location.properties.formatted);
             this.tripForm
               .get('destinationLatitude')
@@ -268,7 +268,7 @@ export class PostTripComponent implements OnInit, AfterViewChecked {
       sourceLatitude: this.tripForm.value.sourceLatitude,
       sourceLongitude: this.tripForm.value.sourceLongitude,
       sourceCity: this.tripForm.value.sourceCity,
-      destinationLocation: this.tripForm.value.destinationLocation,
+      destination: this.tripForm.value.destination,
       destinationLatitude: this.tripForm.value.destinationLatitude,
       destinationLongitude: this.tripForm.value.destinationLongitude,
       destinationCity: this.tripForm.value.destinationCity,

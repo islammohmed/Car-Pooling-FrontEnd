@@ -1,10 +1,29 @@
-<div class="map-container">
-    <div id="map"></div>
-    <div class="autocomplete-wrapper">
-      <div id="autocomplete" class="autocomplete-container"></div>
-      <button id="searchButton" (click)="DepictRoute()">Search</button>
+<div class="track-route-container">
+  <div class="track-header">
+    <div class="back-button" onclick="history.back()">
+      <i class="fas fa-arrow-left"></i> Back
     </div>
-</div>
-<div id="route" class="route-container">
-    <!-- The route will be displayed here -->
+    <h2>Track Trip Route</h2>
+  </div>
+
+  <div class="search-container">
+    <div id="autocomplete" class="autocomplete-container"></div>
+    <button id="searchButton" class="search-btn" (click)="DepictRoute()">
+      <i class="fas fa-search"></i> Find Route
+    </button>
+  </div>
+
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
+
+  <div class="route-info-container">
+    <h3><i class="fas fa-directions"></i> Directions</h3>
+    <div id="route" class="route-instructions">
+      <!-- The route will be displayed here -->
+      <div *ngIf="!hasRouteInstructions" class="no-route">
+        <p>Search for a destination to see directions</p>
+      </div>
+    </div>
+  </div>
 </div>

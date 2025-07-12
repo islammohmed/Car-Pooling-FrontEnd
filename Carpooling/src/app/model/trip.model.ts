@@ -34,8 +34,11 @@ export interface TripListDto {
 
 export interface TripDto {
   id: number;
-  source: string;
+  sourceLocation: string;
   destination: string;
+  destinationLatitute: number;
+  destinationLongitude: number;
+  destinationCity: string;
   departureTime: string;
   availableSeats: number;
   price: number;
@@ -68,7 +71,7 @@ export interface CreateTripDto {
   sourceLongitude: string;
   sourceLatitude: string;
   sourceCity: string;
-  destinationLocation: string;
+  destination: string;
   destinationLongitude: string;
   destinationLatitude: string;
   destinationCity: string;

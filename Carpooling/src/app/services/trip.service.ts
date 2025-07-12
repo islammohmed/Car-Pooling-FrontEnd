@@ -55,7 +55,7 @@ export class TripService {
         if (response && response.data) {
           // Response is wrapped in ApiResponse format
           console.log('Response is in ApiResponse format');
-          apiTrip = response.data;
+          apiTrip = response.data.trip;
         } else if (response && (response.id || response.tripId)) {
           // Response is direct trip object
           console.log('Response is direct trip object');
@@ -74,8 +74,11 @@ export class TripService {
         // Map API response to our TripDto format, handling different response structures
         const mappedTrip: TripDto = {
           id: apiTrip.id || apiTrip.tripId || 0,
-          source: apiTrip.source || apiTrip.sourceLocation || '',
-          destination: apiTrip.destination || '',
+          sourceLocation: apiTrip.source || apiTrip.sourceLocation || '',
+          destination: 'Al Minya',
+          destinationLatitute: apiTrip.destinationLatitute || 0,
+          destinationLongitude: apiTrip.destinationLongitude || 0,
+          destinationCity: apiTrip.destinationCity || '',
           departureTime: apiTrip.departureTime || apiTrip.startTime || '',
           availableSeats: apiTrip.availableSeats || 0,
           price: apiTrip.price || apiTrip.pricePerSeat || 0,
