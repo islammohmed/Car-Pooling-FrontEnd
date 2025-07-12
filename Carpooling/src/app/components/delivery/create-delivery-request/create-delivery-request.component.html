@@ -14,14 +14,18 @@
       <div class="form-group">
         <label for="sourceLocation">Source Location</label>
         <div class="input-wrapper">
-          <i class="fas fa-map-marker-alt"></i>
-          <input 
+          <!-- <i class="fas fa-map-marker-alt"></i> -->
+          <div id="autocomplete" class="autocomplete-container">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <!-- <input 
             type="text" 
             id="sourceLocation" 
             formControlName="sourceLocation" 
             placeholder="Enter pickup location"
             [ngClass]="{'error': deliveryForm.get('sourceLocation')?.invalid && deliveryForm.get('sourceLocation')?.touched}"
-          >
+          > -->
+          
         </div>
         <div class="error-message" *ngIf="deliveryForm.get('sourceLocation')?.invalid && deliveryForm.get('sourceLocation')?.touched">
           Source location is required

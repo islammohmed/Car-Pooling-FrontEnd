@@ -14,6 +14,12 @@ export class RouteService {
     var url = `https://api.geoapify.com/v1/geocode/autocomplete?text=YOUR_TEXT&format=json&apiKey=${this.key}`;
     return this.http.get(url);
   }
+
+  autocomplete(){
+    var url = `https://api.geoapify.com/v1/geocode/autocomplete?text=YOUR_TEXT&format=json&apiKey=${this.key}`;
+    return this.http.get(url);
+  }
+
   getRoute(startLat: number, startLng: number , endLat: number, endLng: number): Observable<MapRoute> {
     console.log(`${startLat},${startLng}|${endLat},${endLng}`)
     let routeApi = `https://api.geoapify.com/v1/routing?waypoints=${startLat},${startLng}|${endLat},${endLng}&mode=drive&apiKey=${this.key}`;

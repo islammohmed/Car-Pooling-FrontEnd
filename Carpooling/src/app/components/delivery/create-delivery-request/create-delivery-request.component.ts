@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { DeliveryService } from '../../../services/delivery.service';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-create-delivery-request',
@@ -13,6 +15,12 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
   styleUrls: ['./create-delivery-request.component.css']
 })
 export class CreateDeliveryRequestComponent implements OnInit {
+  sourceLocation:  {
+        lat: number 
+        long: number 
+        fullAddress: string 
+        city: string
+      } | null = null;
   deliveryForm: FormGroup;
   isSubmitting = false;
   errorMessage = '';
@@ -41,7 +49,31 @@ export class CreateDeliveryRequestComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    let autocomplete = new GeocoderAutocomplete(
+      document.getElementById('autocomplete')!,
+      environment.geoapifyKey
+      // {
+      //   type: 'city',
+      // }
+    );
+    autocomplete.on('select', (location) => {
+      
+    this.deliveryForm.get('sourceLocation')?.setValue((location.properties.country === 'Egypt')? location.properties.state : location.properties.city)
+      // this.sourceLocation
+      // = {
+      //   lat: location.properties.lat,
+      //   long: location.properties.lon,
+      //   fullAddress: location.properties.formatted,
+      //   city: (location.properties.country === 'Egypt')? location.properties.state : location.properties.city
+      // };
+      
+      // console.log(this.sourceLocation);
+      // this.destinationLat.set(location.properties.lat);
+      // this.destinationLng.set(location.properties.lon);
+      // this.DepictRoute();
+    });
+  }
 
   // Custom validator to ensure end date is after start date
   dateRangeValidator(group: FormGroup) {
@@ -70,12 +102,18 @@ export class CreateDeliveryRequestComponent implements OnInit {
     this.errorMessage = '';
 
     // Format dates to ISO string format
-    const formValue = { ...this.deliveryForm.value };
+    const formValue = {
+      ...this.deliveryForm.value,
+    };
     if (formValue.deliveryStartDate) {
-      formValue.deliveryStartDate = new Date(formValue.deliveryStartDate).toISOString();
+      formValue.deliveryStartDate = new Date(
+        formValue.deliveryStartDate
+      ).toISOString();
     }
     if (formValue.deliveryEndDate) {
-      formValue.deliveryEndDate = new Date(formValue.deliveryEndDate).toISOString();
+      formValue.deliveryEndDate = new Date(
+        formValue.deliveryEndDate
+      ).toISOString();
     }
 
     this.deliveryService.createDeliveryRequest(formValue).subscribe({
@@ -83,14 +121,17 @@ export class CreateDeliveryRequestComponent implements OnInit {
         if (response.success) {
           this.router.navigate(['/delivery/matching-trips', response.data.id]);
         } else {
-          this.errorMessage = response.message || 'Failed to create delivery request';
+          this.errorMessage =
+            response.message || 'Failed to create delivery request';
           this.isSubmitting = false;
         }
       },
       error: (error) => {
-        this.errorMessage = error.error?.message || 'An error occurred while creating the delivery request';
+        this.errorMessage =
+          error.error?.message ||
+          'An error occurred while creating the delivery request';
         this.isSubmitting = false;
-      }
+      },
     });
   }
 } 

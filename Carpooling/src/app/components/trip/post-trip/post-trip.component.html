@@ -30,22 +30,26 @@
           <i class="fas fa-exclamation-circle"></i>
           {{ error }}
         </div>
-        
         <!-- Source and Destination -->
         <div class="form-row">
           <div class="form-group half-width">
-            <label for="sourceLocation">From</label>
+            <span class="locationLabel">From</span>
             <div class="input-wrapper">
               <i class="fas fa-map-marker-alt"></i>
-              <input 
-                type="text" 
-                id="sourceLocation" 
-                formControlName="sourceLocation" 
-                placeholder="Enter pickup location"
-                [ngClass]="{'error': isInvalid('sourceLocation')}"
-              >
+              <div class="input-wrapper">
+                <i class="fas fa-map-marker-alt"></i>
+                <!-- <input id="autocomplete" type="text" placeholder="Enter pickup location"
+                  [ngClass]="{'error': isInvalid('sourceLocation')}"> -->
+                  
+              <div id="autocomplete" #autocompleteContainer></div>
+              </div>
+              <!-- type="text" 
+                            
+                            formControlName="sourceLocation" 
+                            
+                            [ngClass]="{'error': isInvalid('sourceLocation')}" -->
             </div>
-            <div *ngIf="isInvalid('sourceLocation')" class="error-message">
+            <div *ngIf="isInvalid('sourceLocation')" class="error-message" >
               Please enter a pickup location
             </div>
           </div>

@@ -65,6 +65,9 @@ export interface TripParticipantDto {
 export interface CreateTripDto {
   driverId: string;
   sourceLocation: string;
+  sourceLongitude: string;
+  sourceLatitude: string;
+  sourceCity: string;
   destination: string;
   startTime: Date;
   pricePerSeat: number;
