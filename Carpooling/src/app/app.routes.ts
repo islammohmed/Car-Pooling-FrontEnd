@@ -12,7 +12,7 @@ import { TestRoutingComponent } from './components/test-routing/test-routing.com
 import { DriverRegistrationComponent } from './components/driver-registration/driver-registration.component';
 import { CreateFeedbackComponent } from './components/feedback/create-feedback/create-feedback.component';
 import { ProfileComponent } from './profile/profile.component';
-import { MapComponent } from './components/map/map.component';
+import { TrackRouteComponent } from './components/track-route/track-route.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -24,7 +24,6 @@ export const routes: Routes = [
     path: 'register', 
     loadChildren: () => import('./components/auth/auth.module').then(m => m.AuthModule) 
   },
-  { path: 'map', component: MapComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
@@ -55,6 +54,10 @@ export const routes: Routes = [
     path: 'trip',
     loadChildren: () => import('./components/trip/trip.module').then(m => m.TripModule),
     canActivate: [AuthGuard]
+  },
+  { 
+    path: 'track/:tripId', 
+    component: TrackRouteComponent
   },
   {
     path: 'admin',

@@ -69,6 +69,9 @@
           <button class="btn btn-primary" (click)="viewTripDetails(trip.id)">
             <i class="fas fa-info-circle"></i> View Details
           </button>
+          <button class="btn btn-primary" (click)="trackTripDetails(trip.id)">
+            <i class="fas fa-info-circle"></i> Track Trip
+          </button>
           <button class="btn btn-outline-info" *ngIf="isDriver && (trip.status === TripStatus.Pending || trip.status === TripStatus.Confirmed)" (click)="viewMatchingDeliveries(trip.id)">
             <i class="fas fa-box"></i> View Matching Deliveries
           </button>

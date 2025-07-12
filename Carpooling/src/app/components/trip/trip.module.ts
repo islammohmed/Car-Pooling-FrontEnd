@@ -9,6 +9,7 @@ import { MyTripsComponent } from './my-trips/my-trips.component';
 import { TripDetailsComponent } from './trip-details/trip-details.component';
 import { SharedModule } from '../shared/shared.module';
 import { TripRoutingModule } from './trip-routing.module';
+import { TrackRouteComponent } from '../track-route/track-route.component';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { TripRoutingModule } from './trip-routing.module';
     SharedModule,
     TripRoutingModule,
     TripSearchComponent,
+    TrackRouteComponent,
     PostTripComponent,
     MyTripsComponent,
     TripDetailsComponent
@@ -27,7 +29,8 @@ import { TripRoutingModule } from './trip-routing.module';
     TripSearchComponent,
     PostTripComponent,
     MyTripsComponent,
-    TripDetailsComponent
+    TripDetailsComponent,
+    TrackRouteComponent
   ]
 })
 export class TripModule { } 

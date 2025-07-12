@@ -5,14 +5,16 @@ import '@geoapify/geocoder-autocomplete/styles/minimal.css';
 import 'leaflet/dist/leaflet.css';
 import { RouteService } from '../../services/route.service';
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  templateUrl: './track-route.component.html',
+  styleUrls: ['./track-route.component.css'],
 })
-export class MapComponent implements OnInit, OnDestroy {
+export class TrackRouteComponent implements OnInit, OnDestroy {
   private map!: L.Map;
+  private tripId: number = -1;
   private userLat = signal<number>(0);
   private userLng = signal<number>(0);
 
@@ -22,11 +24,19 @@ export class MapComponent implements OnInit, OnDestroy {
   private destinationMarker?: L.Marker;
   private routeLine: L.Polyline[] = [];
 
-  constructor(private routeService: RouteService) {}
+  constructor(private routeService: RouteService,
+    private route: ActivatedRoute) {
+    this.tripId = +this.route.snapshot.paramMap.get('tripId')!;
+    debugger;
+  }
 
   ngOnInit(): void {
     if (this.map) return; // prevent duplicate initialization
 
+    setInterval(()=> this.refreshCurrentLocation(), 200)
+  }
+
+  refreshCurrentLocation(): void {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         this.userLat.set(position.coords.latitude);
@@ -56,7 +66,6 @@ export class MapComponent implements OnInit, OnDestroy {
       alert('Geolocation is not supported by this browser.');
     }
   }
-
   // ... rest of your code ...
   DepictRoute() {
     if (this.destinationMarker) {
@@ -97,7 +106,7 @@ export class MapComponent implements OnInit, OnDestroy {
       let popupContent = `<b>Step ${i + 1}:</b> ${step.instruction.text}`;
       let route = document.getElementById('route');
       if (route) {
-        route.innerHTML += `<p>${JSON.stringify(popupContent)}</p>`;
+        route.innerHTML += `<p>${popupContent}</p>`;
       }
     }
       

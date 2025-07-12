@@ -68,7 +68,10 @@ export interface CreateTripDto {
   sourceLongitude: string;
   sourceLatitude: string;
   sourceCity: string;
-  destination: string;
+  destinationLocation: string;
+  destinationLongitude: string;
+  destinationLatitude: string;
+  destinationCity: string;
   startTime: Date;
   pricePerSeat: number;
   availableSeats: number;
