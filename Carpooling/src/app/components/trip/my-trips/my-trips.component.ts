@@ -143,6 +143,16 @@ export class MyTripsComponent implements OnInit {
     this.applyFilter(this.selectedFilter);
   }
 
+  trackTripDetails(tripId: number): void {
+    if (tripId !== undefined && tripId !== null && !isNaN(tripId)) {
+      
+      this.router.navigate([`/track/${tripId}`]);
+    } else {
+      console.error('Invalid trip ID:', tripId);
+      this.notificationService.error('Invalid trip ID');
+    }
+  }
+
   applyFilter(filter: string): void {
     if (filter === 'all') {
       this.filteredTrips = [...this.trips];

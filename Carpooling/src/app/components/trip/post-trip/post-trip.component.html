@@ -57,14 +57,8 @@
           <div class="form-group half-width">
             <label for="destination">To</label>
             <div class="input-wrapper">
-              <i class="fas fa-map-marker-alt"></i>
-              <input 
-                type="text" 
-                id="destination" 
-                formControlName="destination" 
-                placeholder="Enter destination"
-                [ngClass]="{'error': isInvalid('destination')}"
-              >
+              <i class="fas fa-map-marker-alt"></i>              
+              <div id="destinationAutocomplete"></div>
             </div>
             <div *ngIf="isInvalid('destination')" class="error-message">
               Please enter a destination
