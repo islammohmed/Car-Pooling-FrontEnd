@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import {
@@ -12,6 +12,7 @@ import {
   SelectTripDto,
   DeliveryStatus,
 } from '../model/delivery.model';
+import { catchError, retry } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,9 @@ import {
 export class DeliveryService {
   private baseUrl = `${environment.apiUrl}/Delivery`;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService) {
+    console.log('DeliveryService initialized with baseUrl:', this.baseUrl);
+  }
 
   // Get headers with auth token
   private getHeaders(): HttpHeaders {
@@ -38,6 +41,8 @@ export class DeliveryService {
       `${this.baseUrl}`,
       requestData,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Create delivery request'))
     );
   }
 
@@ -46,6 +51,8 @@ export class DeliveryService {
     return this.http.get<ApiResponse<TripListDto[]>>(
       `${this.baseUrl}/matching-trips/${requestId}`,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Get matching trips'))
     );
   }
 
@@ -63,14 +70,20 @@ export class DeliveryService {
         headers: this.getHeaders(),
         params: params,
       }
+    ).pipe(
+      catchError(this.handleError('Get pending requests'))
     );
   }
 
   // Get delivery requests selected for driver's trips
   getSelectedForMe(): Observable<ApiResponse<DeliveryRequestResponseDto[]>> {
+    console.log('Fetching selected deliveries for current user');
     return this.http.get<ApiResponse<DeliveryRequestResponseDto[]>>(
       `${this.baseUrl}/selected-for-me`,
       { headers: this.getHeaders() }
+    ).pipe(
+      retry(1), // Retry once before failing
+      catchError(this.handleError('Get selected deliveries'))
     );
   }
 
@@ -79,6 +92,8 @@ export class DeliveryService {
     return this.http.get<ApiResponse<DeliveryRequestResponseDto[]>>(
       `${this.baseUrl}/my-requests`,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Get my requests'))
     );
   }
 
@@ -87,6 +102,8 @@ export class DeliveryService {
     return this.http.get<ApiResponse<DeliveryRequestResponseDto[]>>(
       `${this.baseUrl}/my-deliveries`,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Get my deliveries'))
     );
   }
 
@@ -99,6 +116,8 @@ export class DeliveryService {
       `${this.baseUrl}/${requestId}/accept?tripId=${tripId}`,
       {},
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Accept delivery'))
     );
   }
 
@@ -110,6 +129,8 @@ export class DeliveryService {
       `${this.baseUrl}/${requestId}/reject`,
       {},
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Reject delivery'))
     );
   }
 
@@ -122,6 +143,8 @@ export class DeliveryService {
       `${this.baseUrl}/${requestId}/status`,
       statusData,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Update delivery status'))
     );
   }
 
@@ -133,6 +156,8 @@ export class DeliveryService {
       `${this.baseUrl}/${requestId}/cancel`,
       {},
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Cancel delivery request'))
     );
   }
 
@@ -143,6 +168,8 @@ export class DeliveryService {
     return this.http.get<ApiResponse<DeliveryRequestResponseDto>>(
       `${this.baseUrl}/${id}`,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Get delivery request'))
     );
   }
 
@@ -155,6 +182,8 @@ export class DeliveryService {
       `${this.baseUrl}/${requestId}/select-trip`,
       selectTripData,
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Select trip for delivery'))
     );
   }
 
@@ -164,6 +193,27 @@ export class DeliveryService {
       `${this.baseUrl}/check-expired`,
       {},
       { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError('Check expired requests'))
     );
+  }
+
+  // Generic error handler
+  private handleError(operation: string) {
+    return (error: any): Observable<any> => {
+      console.error(`${operation} failed:`, error);
+      
+      // Check if it's a network error (status 0)
+      if (error.status === 0) {
+        console.error('Network error detected. API server might be down or unreachable.');
+      }
+      
+      // Return a user-friendly error message
+      return throwError(() => ({
+        success: false,
+        message: `Failed to ${operation.toLowerCase()}: ${error.message || 'Server unreachable'}`,
+        data: null
+      }));
+    };
   }
 }

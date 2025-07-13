@@ -7,22 +7,39 @@
   </div>
 
   <div class="search-container">
-    <div id="autocomplete" class="autocomplete-container"></div>
-    <button id="searchButton" class="search-btn" (click)="DepictRoute()">
-      <i class="fas fa-search"></i> Find Route
+    <div class="location-toggle">
+      <button [class.active]="!useUserLocation" (click)="useUserLocation = false; DepictRoute()">
+        Use Trip Source
+      </button>
+      <button [class.active]="useUserLocation" (click)="useUserLocation = true; DepictRoute()">
+        Use My Location
+      </button>
+    </div>
+    <button id="refreshButton" class="refresh-btn" (click)="refreshCurrentLocation(); DepictRoute()">
+      <i class="fas fa-sync"></i> Refresh Location
     </button>
   </div>
 
   <div class="map-container">
     <div id="map"></div>
+    <div *ngIf="isLoading" class="map-overlay">
+      <div class="spinner"></div>
+      <p>Loading map data...</p>
+    </div>
   </div>
 
   <div class="route-info-container">
     <h3><i class="fas fa-directions"></i> Directions</h3>
+    <div *ngIf="isCalculatingRoute" class="route-loading">
+      <div class="progress-bar">
+        <div class="progress-value"></div>
+      </div>
+      <p>Calculating route... Please wait</p>
+    </div>
     <div id="route" class="route-instructions">
       <!-- The route will be displayed here -->
-      <div *ngIf="!hasRouteInstructions" class="no-route">
-        <p>Search for a destination to see directions</p>
+      <div *ngIf="!hasRouteInstructions && !isLoading && !isCalculatingRoute" class="no-route">
+        <p>Loading directions...</p>
       </div>
     </div>
   </div>

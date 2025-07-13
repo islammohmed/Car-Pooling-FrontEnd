@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NotificationService } from '../../../services/notification.service';
-import { Notification } from '../../../model/notification.model';
+import { CommonModule } from '@angular/common';
+import { NotificationService } from '../../../core/services/notification.service';
+import { Notification } from '../../../core/models';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.css'],
-  standalone: false
+  standalone: true,
+  imports: [CommonModule]
 })
 export class NotificationComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];

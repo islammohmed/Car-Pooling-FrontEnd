@@ -1,0 +1,10 @@
+{
+  "/geoapify": {
+    "target": "https://api.geoapify.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/geoapify": ""
+    }
+  }
+} 

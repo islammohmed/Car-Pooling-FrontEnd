@@ -1,0 +1,102 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <h2>My Trips</h2>
+  
+  <!-- Filter Section -->
+  <div class="filter-container mb-4">
+    <div class="filter-label">
+      <i class="fas fa-filter"></i> Filter by status:
+    </div>
+    <select class="form-select" id="statusFilter" (change)="filterTrips($event)">
+      <option value="all">All Trips</option>
+      <option *ngFor="let status of tripStatuses" [value]="status">{{ status }}</option>
+    </select>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="spinner-container">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredTrips.length === 0" class="empty-state">
+    <i class="fas fa-calendar-times"></i>
+    <h5>No Trips Found</h5>
+    <p>You don't have any trips matching the selected filter.</p>
+  </div>
+
+  <!-- Trip Cards -->
+  <div class="trip-stack" *ngIf="!isLoading && filteredTrips.length > 0">
+    <div class="card" *ngFor="let trip of displayedTrips">
+      <div class="card-body">
+        <div class="trip-header">
+          <div class="trip-route">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ trip.source }}
+            <i class="fas fa-arrow-right"></i>
+            {{ trip.destination }}
+          </div>
+          <span class="badge" [ngClass]="getTripStatusClass(trip.status)">
+            {{ trip.status }}
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-col">
+            <div class="info-item">
+              <i class="fas fa-calendar-alt"></i>
+              <strong>Date:</strong> {{ trip.departureTime | date:'mediumDate' }}
+            </div>
+          </div>
+          <div class="info-col">
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <strong>Time:</strong> {{ trip.departureTime | date:'shortTime' }}
+            </div>
+          </div>
+          <div class="info-col">
+            <div class="info-item">
+              <i class="fas fa-money-bill-wave"></i>
+              <strong>Price:</strong> {{ trip.price | currency:'EGP' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="trip-actions">
+          <button class="btn btn-primary" (click)="viewTripDetails(trip.id)">
+            <i class="fas fa-info-circle"></i> View Details
+          </button>
+          <button class="btn btn-primary" (click)="trackTripDetails(trip.id)">
+            <i class="fas fa-info-circle"></i> Track Trip
+          </button>
+          <button class="btn btn-outline-info" *ngIf="isDriver && (trip.status === TripStatus.Pending || trip.status === TripStatus.Confirmed)" (click)="viewMatchingDeliveries(trip.id)">
+            <i class="fas fa-box"></i> View Matching Deliveries
+          </button>
+          <button class="btn btn-outline-primary" *ngIf="!isDriver && trip.status === TripStatus.Completed" (click)="leaveFeedback(trip.id)">
+            <i class="fas fa-star"></i> Leave Feedback
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-controls" *ngIf="!isLoading && totalPages > 1">
+    <button class="btn btn-outline-secondary" [disabled]="currentPage === 1" (click)="prevPage()">
+      <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    <div class="page-indicator">
+      Page {{ currentPage }} of {{ totalPages }}
+    </div>
+    <button class="btn btn-outline-secondary" [disabled]="currentPage === totalPages" (click)="nextPage()">
+      Next <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+
+
+<app-footer></app-footer>

@@ -75,8 +75,11 @@ export class TripService {
         const mappedTrip: TripDto = {
           id: apiTrip.id || apiTrip.tripId || 0,
           sourceLocation: apiTrip.source || apiTrip.sourceLocation || '',
-          destination: 'Al Minya',
-          destinationLatitute: apiTrip.destinationLatitute || 0,
+          sourceLatitude: apiTrip.sourceLatitude || apiTrip.sourceLat || 0,
+          sourceLongitude: apiTrip.sourceLongitude || apiTrip.sourceLng || 0,
+          sourceCity: apiTrip.sourceCity || '',
+          destination: apiTrip.destination || apiTrip.destinationLocation || '',
+          destinationLatitute: apiTrip.destinationLatitute || apiTrip.destinationLatitude || 0,
           destinationLongitude: apiTrip.destinationLongitude || 0,
           destinationCity: apiTrip.destinationCity || '',
           departureTime: apiTrip.departureTime || apiTrip.startTime || '',
@@ -102,7 +105,13 @@ export class TripService {
 
   // Create a new trip
   createTrip(tripData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}`, tripData);
+    console.log('Creating trip with data:', JSON.stringify(tripData));
+    return this.http.post(`${this.baseUrl}`, tripData).pipe(
+      catchError(error => {
+        console.error('Error creating trip:', error);
+        return throwError(() => new Error(`Failed to create trip: ${error.message || 'Unknown error'}`));
+      })
+    );
   }
 
   // Book a trip
@@ -184,36 +193,72 @@ export class TripService {
   }
 
   getMyTrips(): Observable<TripListDto[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/my-trips`).pipe(
-      map(trips => trips.map(apiTrip => ({
-        id: apiTrip.tripId,
-        source: apiTrip.sourceLocation,
-        destination: apiTrip.destination,
-        departureTime: apiTrip.startTime,
-        availableSeats: apiTrip.availableSeats,
-        price: apiTrip.pricePerSeat,
-        status: apiTrip.status,
-        driverName: apiTrip.driverName,
-        driverRating: apiTrip.driverRating || 0,
-        driverId: apiTrip.driverId || ''
-      })))
+    return this.http.get<any>(`${this.baseUrl}/my-trips`).pipe(
+      map(response => {
+        console.log('Raw my-trips response:', response);
+        let trips: any[] = [];
+        
+        if (Array.isArray(response)) {
+          trips = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          trips = response.data;
+        } else {
+          console.error('Unexpected API response format for my-trips:', response);
+          return [];
+        }
+        
+        return trips.map(apiTrip => ({
+          id: apiTrip.tripId || apiTrip.id || 0,
+          source: apiTrip.sourceLocation || apiTrip.source || '',
+          destination: apiTrip.destination || apiTrip.destinationLocation || '',
+          departureTime: apiTrip.startTime || apiTrip.departureTime || '',
+          availableSeats: apiTrip.availableSeats || 0,
+          price: apiTrip.pricePerSeat || apiTrip.price || 0,
+          status: apiTrip.status || TripStatus.Pending,
+          driverName: apiTrip.driverName || '',
+          driverRating: apiTrip.driverRating || 0,
+          driverId: apiTrip.driverId || ''
+        }));
+      }),
+      catchError(error => {
+        console.error('Error fetching my trips:', error);
+        return throwError(() => new Error(`Failed to load my trips: ${error.message || 'Unknown error'}`));
+      })
     );
   }
 
   getMyBookings(): Observable<TripListDto[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/my-bookings`).pipe(
-      map(trips => trips.map(apiTrip => ({
-        id: apiTrip.tripId,
-        source: apiTrip.sourceLocation,
-        destination: apiTrip.destination,
-        departureTime: apiTrip.startTime,
-        availableSeats: apiTrip.availableSeats,
-        price: apiTrip.pricePerSeat,
-        status: apiTrip.status,
-        driverName: apiTrip.driverName,
-        driverRating: apiTrip.driverRating || 0,
-        driverId: apiTrip.driverId || ''
-      })))
+    return this.http.get<any>(`${this.baseUrl}/my-bookings`).pipe(
+      map(response => {
+        console.log('Raw my-bookings response:', response);
+        let trips: any[] = [];
+        
+        if (Array.isArray(response)) {
+          trips = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          trips = response.data;
+        } else {
+          console.error('Unexpected API response format for my-bookings:', response);
+          return [];
+        }
+        
+        return trips.map(apiTrip => ({
+          id: apiTrip.tripId || apiTrip.id || 0,
+          source: apiTrip.sourceLocation || apiTrip.source || '',
+          destination: apiTrip.destination || apiTrip.destinationLocation || '',
+          departureTime: apiTrip.startTime || apiTrip.departureTime || '',
+          availableSeats: apiTrip.availableSeats || 0,
+          price: apiTrip.pricePerSeat || apiTrip.price || 0,
+          status: apiTrip.status || TripStatus.Pending,
+          driverName: apiTrip.driverName || '',
+          driverRating: apiTrip.driverRating || 0,
+          driverId: apiTrip.driverId || ''
+        }));
+      }),
+      catchError(error => {
+        console.error('Error fetching my bookings:', error);
+        return throwError(() => new Error(`Failed to load my bookings: ${error.message || 'Unknown error'}`));
+      })
     );
   }
 

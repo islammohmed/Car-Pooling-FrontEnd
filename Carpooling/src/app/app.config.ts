@@ -1,11 +1,26 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { 
+  AuthService, 
+  TripService, 
+  FeedbackService, 
+  UserService, 
+  NotificationService,
+  AuthGuard,
+  authInterceptor
+} from './core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient()
+    provideHttpClient(withInterceptors([authInterceptor])),
+    AuthService,
+    TripService,
+    FeedbackService,
+    UserService,
+    NotificationService,
+    AuthGuard
   ]
 };

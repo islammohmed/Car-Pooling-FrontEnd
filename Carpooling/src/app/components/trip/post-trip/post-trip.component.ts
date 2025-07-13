@@ -77,7 +77,7 @@ export class PostTripComponent implements OnInit, AfterViewChecked {
       sourceCity: ['', [Validators.required]],
 
       
-      destination: ['', [Validators.required]],
+      destinationLocation: ['', [Validators.required]],
       destinationLatitude: [0, [Validators.required]],
       destinationLongitude: [0, [Validators.required]],
       destinationCity: ['', [Validators.required]],
@@ -130,66 +130,78 @@ export class PostTripComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked(): void {
-    // Run once after the form is shown and the DOM is ready
+    // Initialize autocomplete after the view is ready
     if (this.isVerified && !this.isLoading) {
-      if (!this.sourceAutocompleteInitialized) {
-        const el = this.autocompleteContainerRef?.nativeElement;
-        if (el) {
-          const autocomplete = new GeocoderAutocomplete(
-            el,
-            environment.geoapifyKey
-          );
-          autocomplete.on('select', (location) => {
-            this.tripForm
-              .get('sourceLocation')
-              ?.setValue(location.properties.formatted);
-            this.tripForm
-              .get('sourceLatitude')
-              ?.setValue(location.properties.lat);
-            this.tripForm
-              .get('sourceLongitude')
-              ?.setValue(location.properties.lon);
-            this.tripForm
-              .get('sourceCity')
-              ?.setValue(
-                location.properties.country === 'Egypt'
-                  ? location.properties.state
-                  : location.properties.city
-              );
-          });
+      this.initializeAutocompletes();
+    }
+  }
 
-          this.sourceAutocompleteInitialized = true;
-        }
+  initializeAutocompletes(): void {
+    // Initialize source autocomplete
+    if (!this.sourceAutocompleteInitialized) {
+      const sourceEl = document.getElementById('autocomplete');
+      if (sourceEl) {
+        const sourceAutocomplete = new GeocoderAutocomplete(
+          sourceEl,
+          environment.geoapifyKey,
+          { 
+            placeholder: 'Enter pickup location',
+            skipIcons: true
+          }
+        );
+        sourceAutocomplete.on('select', (location) => {
+          this.tripForm
+            .get('sourceLocation')
+            ?.setValue(location.properties.formatted);
+          this.tripForm
+            .get('sourceLatitude')
+            ?.setValue(location.properties.lat);
+          this.tripForm
+            .get('sourceLongitude')
+            ?.setValue(location.properties.lon);
+          this.tripForm
+            .get('sourceCity')
+            ?.setValue(
+              location.properties.country === 'Egypt'
+                ? location.properties.state
+                : location.properties.city
+            );
+        });
+        this.sourceAutocompleteInitialized = true;
       }
-      if (!this.destinationAutocompleteInitialized) {
-        // const el = this.autocompleteContainerRef?.nativeElement;
-        const el = document.getElementById('destinationAutocomplete');
-        if (el) {
-          const autocomplete = new GeocoderAutocomplete(
-            el,
-            environment.geoapifyKey
-          );
-          autocomplete.on('select', (location) => {
-            this.tripForm
-              .get('destination')
-              ?.setValue(location.properties.formatted);
-            this.tripForm
-              .get('destinationLatitude')
-              ?.setValue(location.properties.lat);
-            this.tripForm
-              .get('destinationLongitude')
-              ?.setValue(location.properties.lon);
-            this.tripForm
-              .get('destinationCity')
-              ?.setValue(
-                location.properties.country === 'Egypt'
-                  ? location.properties.state
-                  : location.properties.city
-              );
-          });
+    }
 
-          this.destinationAutocompleteInitialized = true;
-        }
+    // Initialize destination autocomplete
+    if (!this.destinationAutocompleteInitialized) {
+      const destEl = document.getElementById('destinationAutocomplete');
+      if (destEl) {
+        const destAutocomplete = new GeocoderAutocomplete(
+          destEl,
+          environment.geoapifyKey,
+          { 
+            placeholder: 'Enter destination',
+            skipIcons: true
+          }
+        );
+        destAutocomplete.on('select', (location) => {
+          this.tripForm
+            .get('destinationLocation')
+            ?.setValue(location.properties.formatted);
+          this.tripForm
+            .get('destinationLatitude')
+            ?.setValue(location.properties.lat);
+          this.tripForm
+            .get('destinationLongitude')
+            ?.setValue(location.properties.lon);
+          this.tripForm
+            .get('destinationCity')
+            ?.setValue(
+              location.properties.country === 'Egypt'
+                ? location.properties.state
+                : location.properties.city
+            );
+        });
+        this.destinationAutocompleteInitialized = true;
       }
     }
   }
@@ -268,14 +280,14 @@ export class PostTripComponent implements OnInit, AfterViewChecked {
       sourceLatitude: this.tripForm.value.sourceLatitude,
       sourceLongitude: this.tripForm.value.sourceLongitude,
       sourceCity: this.tripForm.value.sourceCity,
-      destination: this.tripForm.value.destination,
+      destinationLocation: this.tripForm.value.destinationLocation,
       destinationLatitude: this.tripForm.value.destinationLatitude,
       destinationLongitude: this.tripForm.value.destinationLongitude,
       destinationCity: this.tripForm.value.destinationCity,
       startTime: startTime,
       pricePerSeat: this.tripForm.value.pricePerSeat,
       availableSeats: this.tripForm.value.availableSeats,
-      estimatedDuration: this.tripForm.value.estimatedDuration,
+      estimatedDuration: this.tripForm.value.estimatedDuration + ":00", // Add seconds to match format HH:MM:SS
       genderPreference: this.tripForm.value.genderPreference,
       acceptsDeliveries: this.tripForm.value.acceptsDeliveries,
       maxDeliveryWeight: this.tripForm.value.acceptsDeliveries
